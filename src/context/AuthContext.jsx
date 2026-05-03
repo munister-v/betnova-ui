@@ -136,50 +136,49 @@ export function AuthProvider({ children }) {
     }
   }, [fetchUserProfile])
 
-  // Sign in with email/password
+  const BACKEND = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001'
+
+  // Sign in with email/password — via our backend (no Supabase client needed)
   const signIn = useCallback(async (email, password) => {
     try {
       setIsLoading(true)
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      const res = await fetch(`${BACKEND}/api/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       })
-
-      if (error) throw error
-
-      // Token exchange will be handled automatically by onAuthStateChange
-      // when the SIGNED_IN event is triggered
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Login failed')
+      await fetchUserProfile()
     } catch (error) {
       console.error('Sign in error:', error)
       throw new Error(error.message || 'Sign in failed')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [fetchUserProfile])
 
-  // Sign up with email/password
+  // Register — account created immediately, no email confirmation
   const signUp = useCallback(async (email, password, metadata) => {
     try {
       setIsLoading(true)
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata
-        }
+      const res = await fetch(`${BACKEND}/api/auth/register`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username: metadata?.name || email.split('@')[0] }),
       })
-
-      if (error) throw error
-
-      // Token exchange will be handled automatically by onAuthStateChange
-      // when the SIGNED_IN event is triggered
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Registration failed')
+      await fetchUserProfile()
     } catch (error) {
       console.error('Sign up error:', error)
       throw new Error(error.message || 'Sign up failed')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [fetchUserProfile])
 
   // Login with OTP
   const loginWithOTP = useCallback(async (email, code) => {

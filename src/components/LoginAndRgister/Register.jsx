@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import * as Yup from "yup";
 import { ReactComponent as STEAM } from "../../assets/images/Frame (22).svg";
 import { ReactComponent as TWITCH } from "../../assets/images/Frame (23).svg";
@@ -8,10 +8,8 @@ import SocialMediaButton from "../Common/Buttons/SocialMediaButton/SocialMediaBu
 import { useAuth } from "@/context/AuthContext";
 import { showErrorToast } from "@/utils/toastUtils";
 
-const Register = (props) => {
+const Register = ({ onSuccess }) => {
   const { signUp } = useAuth();
-  const [emailSent, setEmailSent] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -36,8 +34,7 @@ const Register = (props) => {
     onSubmit: async (values) => {
       try {
         await signUp(values.email, values.password, { name: values.username });
-        setRegisteredEmail(values.email);
-        setEmailSent(true);
+        if (onSuccess) onSuccess();
       } catch (error) {
         console.error("Registration failed:", error);
         showErrorToast(error.message || "Registration failed. Please try again.");
@@ -45,47 +42,6 @@ const Register = (props) => {
       }
     },
   });
-
-  if (emailSent) {
-    return (
-      <div style={{ textAlign: "center", padding: "24px 0" }}>
-        <div
-          style={{
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            background: "rgba(255, 232, 26, 0.12)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 20px",
-          }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              stroke="#FFE81A"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <p style={{ color: "#fff", fontSize: "16px", fontWeight: "bold", marginBottom: "8px" }}>
-          Check your email
-        </p>
-        <p style={{ color: "#B1B6C6", fontSize: "14px", lineHeight: "1.5" }}>
-          We sent a confirmation link to
-        </p>
-        <p style={{ color: "#FFE81A", fontSize: "14px", marginBottom: "20px" }}>
-          {registeredEmail}
-        </p>
-        <p style={{ color: "#B1B6C6", fontSize: "13px" }}>
-          Click the link in the email to activate your account.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <>

@@ -115,7 +115,7 @@ const RegisterModal = ({ buttonText, modalOption }) => {
                   </span>
                 </div>
               </div>
-              {openedModal === "login" ? <Login /> : <Register />}
+              {openedModal === "login" ? <Login onSuccess={() => setShowModal(false)} /> : <Register onSuccess={() => setShowModal(false)} />}
             </div>
 
             {!isTabletScreen ? (

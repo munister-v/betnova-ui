@@ -12,7 +12,7 @@ import SocialMediaButton from "../Common/Buttons/SocialMediaButton/SocialMediaBu
 import { useAuth } from "@/context/AuthContext";
 import { showErrorToast } from "@/utils/toastUtils";
 
-const Login = (props) => {
+const Login = ({ onSuccess }) => {
   const { signIn } = useAuth();
   const { updateLoggedIn } = useContext(AppContext);
 
@@ -36,6 +36,7 @@ const Login = (props) => {
         // Handle form submission (e.g., login request)
         await signIn(values.email, values.password);
         updateLoggedIn(true);
+        if (onSuccess) onSuccess();
       } catch (error) {
         console.error("Login failed:", error);
         // Set error message to display in UI
