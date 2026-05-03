@@ -1,326 +1,262 @@
-import { useFormik } from "formik";
 import React, { useState } from "react";
-import * as Yup from "yup";
-import supabase from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
-
-// Importing SVG icons
+import toast from "react-hot-toast";
 import { ReactComponent as GEAR } from "../../../../assets/images/Frame (51).svg";
 import AccountPageTitle from "../Common/AccountPageTitle";
 import { StyleProfile } from "../Profile/styles";
 
-const Settings = () => {
-  const { user } = useAuth();
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastError, setToastError] = useState(false);
+const API = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
-  const displayToast = (message, isError = false) => {
-    setToastMessage(message);
-    setToastError(isError);
-    setTimeout(() => {
-      setToastMessage("");
-      setToastError(false);
-    }, 3000);
+async function apiPost(path, body) {
+  const res = await fetch(`${API}${path}`, {
+    method: "POST", credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+async function apiPut(path, body) {
+  const res = await fetch(`${API}${path}`, {
+    method: "PUT", credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+function SectionCard({ title, subtitle, badge, badgeColor = "#555", children }) {
+  return (
+    <div style={{
+      background: "rgba(15,17,26,0.6)",
+      border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: 14, padding: "20px 24px", marginBottom: 16,
+      backdropFilter: "blur(8px)",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: "#fff" }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: "#676D7C", marginTop: 3 }}>{subtitle}</div>}
+        </div>
+        {badge && (
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: "4px 10px",
+            borderRadius: 6, background: `${badgeColor}22`,
+            color: badgeColor, border: `1px solid ${badgeColor}44`,
+          }}>{badge}</span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = "text", placeholder, readOnly }) {
+  return (
+    <div style={{ marginBottom: 12 }}>
+      {label && <label style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 6 }}>{label}</label>}
+      <input
+        type={type} value={value}
+        onChange={onChange} placeholder={placeholder} readOnly={readOnly}
+        style={{
+          width: "100%", boxSizing: "border-box",
+          padding: "10px 14px", borderRadius: 8,
+          border: "1px solid rgba(255,255,255,0.1)",
+          background: readOnly ? "rgba(255,255,255,0.03)" : "rgba(15,17,26,0.8)",
+          color: readOnly ? "#555" : "#fff",
+          fontSize: 13, outline: "none",
+          cursor: readOnly ? "not-allowed" : "text",
+        }}
+      />
+    </div>
+  );
+}
+
+function SaveBtn({ onClick, loading, label = "Save Changes", danger }) {
+  return (
+    <button onClick={onClick} disabled={loading} style={{
+      padding: "10px 24px", borderRadius: 8, border: "none",
+      cursor: loading ? "not-allowed" : "pointer",
+      fontWeight: 700, fontSize: 13,
+      background: danger ? "linear-gradient(135deg,#ef4444,#dc2626)" : "linear-gradient(135deg,#7c3aed,#6d28d9)",
+      color: "#fff",
+      boxShadow: danger ? "0 4px 16px rgba(239,68,68,0.25)" : "0 4px 16px rgba(124,58,237,0.3)",
+      opacity: loading ? 0.7 : 1, transition: "opacity 0.2s",
+    }}>
+      {loading ? "Saving..." : label}
+    </button>
+  );
+}
+
+export default function Settings() {
+  const { user, fetchUserProfile } = useAuth();
+
+  const [username,       setUsername]       = useState(user?.username || "");
+  const [savingUsername, setSavingUsername] = useState(false);
+
+  const [email,       setEmail]       = useState("");
+  const [savingEmail, setSavingEmail] = useState(false);
+
+  const [currPass,    setCurrPass]    = useState("");
+  const [newPass,     setNewPass]     = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [savingPass,  setSavingPass]  = useState(false);
+  const [showPass,    setShowPass]    = useState(false);
+
+  const [rotatingSeed, setRotatingSeed] = useState(false);
+
+  const handleUsername = async () => {
+    const trimmed = username.trim();
+    if (!trimmed || trimmed === user?.username) return;
+    if (trimmed.length < 3) { toast.error("Min 3 characters"); return; }
+    setSavingUsername(true);
+    try {
+      const d = await apiPut("/api/user/profile", { username: trimmed });
+      if (d.success) { toast.success("Username updated!"); fetchUserProfile?.(); }
+      else toast.error(d.error || "Failed");
+    } catch { toast.error("Network error"); }
+    finally { setSavingUsername(false); }
   };
 
-  const emailValidationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-  });
+  const handleEmail = async () => {
+    if (!email.trim()) return;
+    setSavingEmail(true);
+    try {
+      const d = await apiPost("/api/user/change-email", { email: email.trim() });
+      if (d.success) { toast.success("Email updated!"); setEmail(""); fetchUserProfile?.(); }
+      else toast.error(d.error || "Failed");
+    } catch { toast.error("Network error"); }
+    finally { setSavingEmail(false); }
+  };
 
-  const passwordValidationSchema = Yup.object().shape({
-    oldPassword: Yup.string().required("Old Password is required"),
-    newPassword: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("New Password is required"),
-  });
+  const handlePassword = async () => {
+    if (!currPass || !newPass) { toast.error("Fill all fields"); return; }
+    if (newPass.length < 6)   { toast.error("Min 6 characters"); return; }
+    if (newPass !== confirmPass) { toast.error("Passwords don't match"); return; }
+    setSavingPass(true);
+    try {
+      const d = await apiPost("/api/user/change-password", { currentPassword: currPass, newPassword: newPass });
+      if (d.success) { toast.success("Password changed!"); setCurrPass(""); setNewPass(""); setConfirmPass(""); }
+      else toast.error(d.error || "Failed");
+    } catch { toast.error("Network error"); }
+    finally { setSavingPass(false); }
+  };
 
-  const emailFormik = useFormik({
-    initialValues: {
-      email: "",
-    },
-    validationSchema: emailValidationSchema,
-    onSubmit: async (values, { resetForm, setSubmitting }) => {
-      try {
-        const { error } = await supabase.auth.updateUser({ email: values.email });
-        if (error) throw error;
-        displayToast("Confirmation email sent. Please check your inbox.");
-        resetForm();
-      } catch (err) {
-        displayToast(err.message || "Failed to update email.", true);
-      } finally {
-        setSubmitting(false);
-      }
-    },
-  });
-
-  const passwordFormik = useFormik({
-    initialValues: {
-      oldPassword: "",
-      newPassword: "",
-    },
-    validationSchema: passwordValidationSchema,
-    onSubmit: async (values, { resetForm, setSubmitting }) => {
-      try {
-        // Re-authenticate with old password first
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: user?.email,
-          password: values.oldPassword,
-        });
-        if (signInError) throw new Error("Old password is incorrect.");
-
-        const { error } = await supabase.auth.updateUser({ password: values.newPassword });
-        if (error) throw error;
-        displayToast("Password changed successfully.");
-        resetForm();
-      } catch (err) {
-        displayToast(err.message || "Failed to change password.", true);
-      } finally {
-        setSubmitting(false);
-      }
-    },
-  });
+  const handleRotateSeed = async () => {
+    setRotatingSeed(true);
+    try {
+      const res = await fetch(`${API}/api/user/regenerate-seed`, { method: "POST", credentials: "include" });
+      const d = await res.json();
+      if (d.success) { toast.success("Seeds rotated! New cycle started."); fetchUserProfile?.(); }
+      else toast.error(d.error || "Failed");
+    } catch { toast.error("Network error"); }
+    finally { setRotatingSeed(false); }
+  };
 
   return (
     <StyleProfile>
-      {/* SETTINGS TITLE */}
       <AccountPageTitle icon={GEAR} title="SETTINGS" />
 
-      <div class="section-container">
-        <div class="title-status">
-          <h3 class="section-title" style={{ margin: "0px" }}>
-            Email Address{" "}
-          </h3>
-          <div
-            class="btn-show"
-            style={{ marginRight: "auto" }}
-            onClick={() => displayToast("More Shown!")}
-          >
-            Show
-          </div>
-          <div class="status">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              x="0px"
-              y="0px"
-              width="52px"
-              height="52px"
-              viewBox="0 0 52 52"
-              enable-background="new 0 0 52 52"
-              color="currentColor"
-              size="16"
-              style={{ color: "rgb(94, 98, 111)", marginRight: "8px" }}
-            >
-              <path d="M26,2C12.7,2,2,12.7,2,26s10.7,24,24,24s24-10.7,24-24S39.3,2,26,2z M39.4,20L24.1,35.5 c-0.6,0.6-1.6,0.6-2.2,0L13.5,27c-0.6-0.6-0.6-1.6,0-2.2l2.2-2.2c0.6-0.6,1.6-0.6,2.2,0l4.4,4.5c0.4,0.4,1.1,0.4,1.5,0L35,15.5 c0.6-0.6,1.6-0.6,2.2,0l2.2,2.2C40.1,18.3,40.1,19.3,39.4,20z"></path>
-            </svg>
-            <div>{user?.email || "Unverified"}</div>
-          </div>
-        </div>
-        <form onSubmit={emailFormik.handleSubmit}>
-          <div>
-            <label htmlFor="rollbit-field-11414" className="input-label">
-              Change Email
-            </label>
-            <div>
-              <div className="input-container">
-                <input
-                  type="text"
-                  name="email"
-                  placeholder="Enter new email address"
-                  id="rollbit-field-11414"
-                  value={emailFormik.values.email}
-                  onChange={emailFormik.handleChange}
-                />
-                <button
-                  className="change-button"
-                  type="submit"
-                  disabled={!emailFormik.values.email}
-                  style={{ marginRight: "4px" }}
-                >
-                  Change
-                </button>
-              </div>
-            </div>
-          </div>
-          {emailFormik.errors.email && (
-            <div className="required">{emailFormik.errors.email}</div>
-          )}
-          <button
-            className="submit-button"
-            type="button"
-            style={{ marginTop: "24px" }}
-            onClick={async () => {
-              const { error } = await supabase.auth.resend({ type: "signup", email: user?.email });
-              if (error) displayToast(error.message, true);
-              else displayToast("Verification email sent!");
-            }}
-          >
-            Send verification email
-          </button>
-        </form>
-      </div>
+      {/* Profile */}
+      <SectionCard title="Profile" subtitle="Update your public display name">
+        <Field label="Username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Your username" />
+        <Field label="Account email (read-only)" value={user?.email || ""} readOnly />
+        <SaveBtn onClick={handleUsername} loading={savingUsername} label="Update Username" />
+      </SectionCard>
 
-      {/* PASSWORD */}
-      <div className="section-container">
-        <h3 className="section-title">Change password</h3>
-        <form onSubmit={passwordFormik.handleSubmit}>
-          <div>
-            <label htmlFor="rollbit-field-39860" className="input-label">
-              Old Password<span className="required"> *</span>
-            </label>
-            <div>
-              <div className="input-container">
-                <input
-                  type="password"
-                  name="oldPassword"
-                  id="rollbit-field-39860"
-                  value={passwordFormik.values.oldPassword}
-                  onChange={passwordFormik.handleChange}
-                  placeholder="********"
-                />
-              </div>
+      {/* Email */}
+      <SectionCard
+        title="Email Address"
+        subtitle="Change your login email"
+        badge={user?.email ? "Linked" : "Not set"}
+        badgeColor={user?.email ? "#22c55e" : "#ef4444"}
+      >
+        <Field label="New Email" value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Enter new email address" />
+        <SaveBtn onClick={handleEmail} loading={savingEmail} label="Update Email" />
+      </SectionCard>
+
+      {/* Password */}
+      <SectionCard title="Change Password" subtitle="Use a strong, unique password">
+        <Field label="Current Password" value={currPass} onChange={e => setCurrPass(e.target.value)} type={showPass ? "text" : "password"} placeholder="••••••••" />
+        <Field label="New Password"     value={newPass}  onChange={e => setNewPass(e.target.value)}  type={showPass ? "text" : "password"} placeholder="Min 6 characters" />
+        <Field label="Confirm New Password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} type={showPass ? "text" : "password"} placeholder="Repeat new password" />
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 4 }}>
+          <SaveBtn onClick={handlePassword} loading={savingPass} label="Change Password" />
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 12, color: "#888", userSelect: "none" }}>
+            <input type="checkbox" checked={showPass} onChange={e => setShowPass(e.target.checked)} style={{ cursor: "pointer" }} />
+            Show passwords
+          </label>
+        </div>
+      </SectionCard>
+
+      {/* Provably Fair seeds */}
+      <SectionCard title="🔐 Provably Fair Seeds" subtitle="Rotate seeds to start a fresh verification cycle" badge="Active" badgeColor="#22c55e">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          {[
+            { label: "Server Seed Hash", value: user?.server_seed_hash },
+            { label: "Client Seed",      value: user?.client_seed },
+          ].map(f => (
+            <div key={f.label} style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "10px 14px" }}>
+              <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{f.label}</div>
+              <div style={{ fontFamily: "monospace", fontSize: 11, color: "#888", wordBreak: "break-all" }}>{f.value || "—"}</div>
             </div>
-            {passwordFormik.errors.oldPassword && (
-              <div className="required">
-                {passwordFormik.errors.oldPassword}
-              </div>
-            )}
-          </div>
-          <br />
-          <div>
-            <label htmlFor="rollbit-field-39861" className="input-label">
-              New Password<span className="required"> *</span>
-            </label>
-            <div>
-              <div className="input-container">
-                <input
-                  type="password"
-                  name="newPassword"
-                  id="rollbit-field-39861"
-                  value={passwordFormik.values.newPassword}
-                  onChange={passwordFormik.handleChange}
-                  placeholder="********"
-                />
-              </div>
-            </div>
-            {passwordFormik.errors.newPassword && (
-              <div className="required">
-                {passwordFormik.errors.newPassword}
-              </div>
-            )}
-          </div>
-          <button
-            className="submit-button"
-            type="submit"
-            disabled={
-              !passwordFormik.values.oldPassword ||
-              !passwordFormik.values.newPassword
-            }
-            style={{ marginTop: "24px" }}
-          >
-            Change Password
-          </button>
-        </form>
-      </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 12, color: "#555", marginBottom: 14, lineHeight: 1.7 }}>
+          ⚠ Rotating seeds reveals your current server seed. Save it first if you want to verify past rounds on the{" "}
+          <a href="/fairness" style={{ color: "#a78bfa" }}>Provably Fair page</a>.
+        </div>
+        <SaveBtn onClick={handleRotateSeed} loading={rotatingSeed} label="🔄 Rotate Seeds" />
+      </SectionCard>
 
       {/* 2FA */}
-      <div className="section-container">
-        <div className="title-status">
-          <h3 className="section-title" style={{ margin: "0px auto 0px 0px" }}>
-            Two-factor Authentication
-          </h3>
-          <div className="status">
-            <svg
-              enableBackground="new 0 0 229.5 229.5"
-              viewBox="0 0 229.5 229.5"
-              xmlns="http://www.w3.org/2000/svg"
-              size="15"
-              color="#5E626F"
-              style={{ marginRight: "8px" }}
-            >
-              <path d="m214.419 32.12c-.412-2.959-2.541-5.393-5.419-6.193l-92.24-25.652c-1.315-.366-2.704-.366-4.02 0l-92.24 25.652c-2.878.8-5.007 3.233-5.419 6.193-.535 3.847-12.74 94.743 18.565 139.961 31.268 45.164 77.395 56.738 79.343 57.209.579.14 1.169.209 1.761.209s1.182-.07 1.761-.209c1.949-.471 48.076-12.045 79.343-57.209 31.305-45.217 19.1-136.113 18.565-139.961zm-40.186 53.066-62.917 62.917c-1.464 1.464-3.384 2.197-5.303 2.197s-3.839-.732-5.303-2.197l-38.901-38.901c-1.407-1.406-2.197-3.314-2.197-5.303s.791-3.897 2.197-5.303l7.724-7.724c2.929-2.928 7.678-2.929 10.606 0l25.874 25.874 49.89-49.891c1.406-1.407 3.314-2.197 5.303-2.197s3.897.79 5.303 2.197l7.724 7.724c2.929 2.929 2.929 7.678 0 10.607z"></path>
-            </svg>
-            <span>Disabled</span>
-          </div>
-        </div>
-        <p className="description-text">
-          Using two-factor authentication is highly recommended because it
-          protects your account with both your password and your phone.
+      <SectionCard title="Two-Factor Authentication" subtitle="Extra security layer for your account" badge="Disabled" badgeColor="#f59e0b">
+        <p style={{ fontSize: 13, color: "#676D7C", margin: "0 0 16px", lineHeight: 1.7 }}>
+          TOTP two-factor authentication adds a second verification step on login, protecting your account even if your password is compromised.
         </p>
-        <p className="description-text" style={{ marginBottom: "24px" }}>
-          While 2FA is enabled, you will not be able to login via Steam.
-        </p>
-        <button
-          className="submit-button"
-          onClick={() => displayToast("Two-Factor Authentication Enabled!")}
-        >
-          Enable 2FA
-        </button>
-      </div>
+        <button onClick={() => toast("2FA coming soon!", { icon: "🚧" })} style={{
+          padding: "10px 24px", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: 13,
+          background: "rgba(245,158,11,0.08)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.3)",
+        }}>Enable 2FA</button>
+      </SectionCard>
 
-      {/* VERIFY IDENTITY */}
-      <div className="section-container">
-        <div className="title-status">
-          <h3 className="section-title" style={{ margin: "0px auto 0px 0px" }}>
-            Verify your identity (KYC)
-          </h3>
-          <div className="status">
-            <svg
-              enableBackground="new 0 0 229.5 229.5"
-              viewBox="0 0 229.5 229.5"
-              xmlns="http://www.w3.org/2000/svg"
-              size="15"
-              color="#5E626F"
-              style={{ marginRight: "8px" }}
-            >
-              <path d="m214.419 32.12c-.412-2.959-2.541-5.393-5.419-6.193l-92.24-25.652c-1.315-.366-2.704-.366-4.02 0l-92.24 25.652c-2.878.8-5.007 3.233-5.419 6.193-.535 3.847-12.74 94.743 18.565 139.961 31.268 45.164 77.395 56.738 79.343 57.209.579.14 1.169.209 1.761.209s1.182-.07 1.761-.209c1.949-.471 48.076-12.045 79.343-57.209 31.305-45.217 19.1-136.113 18.565-139.961zm-40.186 53.066-62.917 62.917c-1.464 1.464-3.384 2.197-5.303 2.197s-3.839-.732-5.303-2.197l-38.901-38.901c-1.407-1.406-2.197-3.314-2.197-5.303s.791-3.897 2.197-5.303l7.724-7.724c2.929-2.928 7.678-2.929 10.606 0l25.874 25.874 49.89-49.891c1.406-1.407 3.314-2.197 5.303-2.197s3.897.79 5.303 2.197l7.724 7.724c2.929 2.929 2.929 7.678 0 10.607z"></path>
-            </svg>
-            <span>Unverified</span>
-          </div>
+      {/* KYC */}
+      <SectionCard title="Identity Verification (KYC)" subtitle="Required for withdrawals above $500" badge="Unverified" badgeColor="#ef4444">
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+          {[
+            { emoji: "📋", text: "Basic KYC",    sub: "Up to $500/day"  },
+            { emoji: "🪪", text: "Full KYC",     sub: "Up to $10K/day" },
+            { emoji: "🏦", text: "Enhanced KYC", sub: "Unlimited"       },
+          ].map(tier => (
+            <div key={tier.text} style={{
+              flex: "1 1 130px", borderRadius: 10, padding: 14,
+              background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center",
+            }}>
+              <div style={{ fontSize: 22, marginBottom: 6 }}>{tier.emoji}</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>{tier.text}</div>
+              <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>{tier.sub}</div>
+              <div style={{ marginTop: 8, fontSize: 11, color: "#ef4444", fontWeight: 600 }}>✗ Not verified</div>
+            </div>
+          ))}
         </div>
-        <button
-          className="submit-button"
-          onClick={() => displayToast("Your Identity is Verified!")}
-        >
-          Verify
-        </button>
-      </div>
+        <button onClick={() => toast("KYC verification coming soon!", { icon: "📋" })} style={{
+          padding: "10px 24px", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: 13,
+          background: "rgba(245,158,11,0.07)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.2)",
+        }}>Start Verification →</button>
+      </SectionCard>
 
-      {/* LOGIN HISTORY */}
-      <div className="section-container">
-        <div className="title-button">
-          <h3 className="section-title" style={{ margin: "0px auto 0px 0px" }}>
-            Login History
-          </h3>
-          <button
-            className="change-button"
-            onClick={() => displayToast("Login History!")}
-          >
-            Show
-          </button>
+      {/* Danger zone */}
+      <SectionCard title="⚠️ Danger Zone" subtitle="Irreversible account actions">
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button onClick={() => toast.error("Contact support to close your account")} style={{
+            padding: "9px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12,
+            background: "rgba(239,68,68,0.07)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)",
+          }}>Close Account</button>
+          <button onClick={() => toast("Self-exclusion coming soon", { icon: "🚫" })} style={{
+            padding: "9px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 12,
+            background: "rgba(245,158,11,0.07)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.3)",
+          }}>Self-Exclusion</button>
         </div>
-      </div>
-
-      {/* TIPS */}
-      <div className="section-container">
-        <div className="title-button">
-          <h3 className="section-title" style={{ margin: "0px auto 0px 0px" }}>
-            Tips
-          </h3>
-          <button
-            className="change-button"
-            onClick={() => displayToast("Tips!")}
-          >
-            Show
-          </button>
-        </div>
-      </div>
-      {toastMessage && (
-        <div className="toast" style={toastError ? { background: "#c0392b" } : {}}>
-          {toastMessage}
-        </div>
-      )}
+      </SectionCard>
     </StyleProfile>
   );
-};
-
-export default Settings;
+}
