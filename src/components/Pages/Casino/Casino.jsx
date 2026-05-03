@@ -6,6 +6,7 @@ import NavigationHeader from "../../Common/NavigationHeader/NavigationHeader";
 import SearchAndFilters from "../../Common/SearchAndFilters/SearchAndFilters";
 import LiveWinsSection from "../../Common/WinnerCard/LiveWinsSection";
 import GameTiles from "../../Common/GameTiles/GameTiles";
+import DailyBonus from "../../Common/DailyBonus/DailyBonus";
 import { StyledPageContainer } from "./styles";
 
 const Casino = () => {
@@ -18,6 +19,9 @@ const Casino = () => {
 
       <NavigationHeader isNftPage={false} />
       <div className="content-container">
+        <div style={{ marginBottom: 20 }}>
+          <DailyBonus />
+        </div>
         <GameTiles title="BetNova Originals" />
 
         <SearchAndFilters />

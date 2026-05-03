@@ -13,6 +13,7 @@ import DropdownOptions from "./DropdownOptions";
 import SideBarClosed from "./SideBarClosed";
 import SidebarOption from "./SidebarOption";
 import { StyledOpenedSidebar } from "./StyledSidebar";
+import DailyBonus from "../../Common/DailyBonus/DailyBonus";
 
 const SideBar = () => {
   const [sections, setSections] = useState(SECTIONS);
@@ -159,6 +160,11 @@ const SideBar = () => {
           </div>
         ))}
         <div className="divider" />
+
+        {/* Daily Bonus */}
+        <div style={{ padding: "0 12px", marginBottom: 12 }}>
+          <DailyBonus />
+        </div>
 
         <div className="payment">
           <Button className="buy-crypto" onClick={() => {}}>Buy Crypto</Button>
