@@ -44,6 +44,7 @@ import NFTMyLootboxes from "./components/Pages/NFT/NFTMyLootboxes";
 import NFTMyPurchases from "./components/Pages/NFT/NFTMyPurchases";
 import NFTMySales from "./components/Pages/NFT/NFTMySales";
 import AKLottery from "./components/Pages/Other/AKLottery";
+import ProvablyFair from "./components/Pages/Other/ProvablyFair";
 import Jackpot from "./components/Pages/Other/Jackpot";
 import Race25K from "./components/Pages/Other/Race25k";
 import Streams from "./components/Pages/Other/Streams";
@@ -110,6 +111,7 @@ const routesContentLayout = [
   { path: "/jackpot", component: Jackpot },
   { path: "/streams", component: Streams },
   { path: "/25k-race", component: Race25K },
+  { path: "/fairness", component: ProvablyFair },
   { path: "/nft", component: NFTMainPage },
   { path: "/nft/lobby/:tab", component: AKBots },
   { path: "/nft/loans", component: NFTLoans },

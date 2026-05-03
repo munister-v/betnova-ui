@@ -14,6 +14,7 @@ import SideBarClosed from "./SideBarClosed";
 import SidebarOption from "./SidebarOption";
 import { StyledOpenedSidebar } from "./StyledSidebar";
 import DailyBonus from "../../Common/DailyBonus/DailyBonus";
+import { Link } from "react-router-dom";
 
 const SideBar = () => {
   const [sections, setSections] = useState(SECTIONS);
@@ -162,8 +163,30 @@ const SideBar = () => {
         <div className="divider" />
 
         {/* Daily Bonus */}
-        <div style={{ padding: "0 12px", marginBottom: 12 }}>
+        <div style={{ padding: "0 12px", marginBottom: 8 }}>
           <DailyBonus />
+        </div>
+
+        {/* Provably Fair link */}
+        <div style={{ padding: "0 12px", marginBottom: 12 }}>
+          <Link to="/fairness" style={{ textDecoration: "none" }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "11px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              cursor: "pointer", transition: "background 0.2s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(139,92,246,0.1)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
+            >
+              <span style={{ fontSize: 18 }}>🔐</span>
+              <div>
+                <div style={{ color: "#c4b5fd", fontSize: 12, fontWeight: 700 }}>Provably Fair</div>
+                <div style={{ color: "#676D7C", fontSize: 10, marginTop: 1 }}>Verify any game outcome</div>
+              </div>
+            </div>
+          </Link>
         </div>
 
         <div className="payment">
