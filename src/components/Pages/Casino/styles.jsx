@@ -24,7 +24,7 @@ export const StyledPageContainer = styled.div`
   .content-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
 
     .image-cards {
       display: grid;
