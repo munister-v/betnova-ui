@@ -5,14 +5,16 @@ import CloseButtonModal from "../CloseButtonModal";
 import Modal from "../Modal";
 import CouponsReferralsContent from "./CouponsReferralsContent";
 import DepositWithdrawContent from "./DepositWithdrawContent";
+import BuyCryptoContent from "./BuyCryptoContent";
 import NavigationCashier from "./NavigationCashier";
 import { StyledCashierModal } from "./styles";
 
 const CashierModal = ({ button }) => {
-  const { selectedOptionCashier, isTabletScreen } = useContext(AppContext);
+  const { selectedOptionCashier, updateCashierOption, isTabletScreen } = useContext(AppContext);
 
   const [isOpen, setIsOpen] = useState(false);
   const handleOpenModal = () => {
+    if (button === "Buy Crypto") updateCashierOption("Buy Crypto");
     setIsOpen(true);
   };
 
@@ -92,6 +94,10 @@ const CashierModal = ({ button }) => {
 
           {selectedOptionCashier === "Withdraw" ? (
             <DepositWithdrawContent option={selectedOptionCashier} />
+          ) : null}
+
+          {selectedOptionCashier === "Buy Crypto" ? (
+            <BuyCryptoContent handleBack={() => updateCashierOption("Deposit")} />
           ) : null}
 
           {selectedOptionCashier === "Coupons" ? (

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { AppContext } from "../../../context/AppContext";
 import { StyledNavigationCashier } from "./styles";
-const options = ["Deposit", "Withdraw", "Coupons", "Referrals"];
+const options = ["Deposit", "Withdraw", "Buy Crypto", "Coupons", "Referrals"];
 
 const NavigationCashier = () => {
   const { selectedOptionCashier, updateCashierOption } = useContext(AppContext);
