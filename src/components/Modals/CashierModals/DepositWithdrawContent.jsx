@@ -19,7 +19,7 @@ function AssetDepositView({ asset, handleBack }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch(`${BACKEND}/api/payment/user/wallet`, {
+    fetch(`${BACKEND}/api/payment/deposit/create`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
