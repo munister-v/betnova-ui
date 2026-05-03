@@ -18,10 +18,7 @@ const Register = ({ onSuccess }) => {
     email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string()
       .required("Password is required")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        "Password must contain at least 8 characters, one uppercase letter, one number, and one special symbol"
-      ),
+      .min(6, "Password must be at least 6 characters"),
   });
 
   const formik = useFormik({
@@ -60,7 +57,7 @@ const Register = ({ onSuccess }) => {
               onChange={formik.handleChange}
               placeholder="Username"
             />
-            {formik.errors.username && (
+            {formik.touched.username && formik.errors.username && (
               <div className="error-message">{formik.errors.username}</div>
             )}
           </div>
@@ -78,7 +75,7 @@ const Register = ({ onSuccess }) => {
               onChange={formik.handleChange}
               placeholder="youremail@domain.com"
             />
-            {formik.errors.email && (
+            {formik.touched.email && formik.errors.email && (
               <div className="error-message">{formik.errors.email}</div>
             )}
           </div>
@@ -97,7 +94,7 @@ const Register = ({ onSuccess }) => {
               placeholder="********"
               autoComplete="new-password"
             />
-            {formik.errors.password && (
+            {formik.touched.password && formik.errors.password && (
               <div className="error-message">{formik.errors.password}</div>
             )}
           </div>
