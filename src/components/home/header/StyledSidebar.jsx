@@ -4,7 +4,7 @@ export const StyledOpenedSidebar = styled.div`
   width: 240px;
   height: calc(100vh - 65px);
   flex: 0 0 auto;
-  background: #1a1d29;
+  background: #080a10;
   top: 65px;
   left: 0;
   scroll-padding-top: 9rem;
@@ -20,7 +20,7 @@ export const StyledOpenedSidebar = styled.div`
     flex-direction: column;
     padding: 20px 16px;
     height: 100%;
-    background-color: rgb(31, 35, 48);
+    background-color: #0c0e18;
     overflow: hidden auto;
 
     &::-webkit-scrollbar {
@@ -28,7 +28,7 @@ export const StyledOpenedSidebar = styled.div`
     }
 
     &::-webkit-scrollbar-track {
-      background: #1a1d29;
+      background: #080a10;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -74,7 +74,7 @@ export const StyledOpenedSidebar = styled.div`
   }
 
   .opened-dropdown {
-    background: rgb(26, 29, 41) !important;
+    background: #080a10 !important;
   }
 
   .option-active {
@@ -170,8 +170,9 @@ export const StyledClosedSidebar = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #1f2330;
+  background: #080a10;
   width: 55px;
+  border-right: 1px solid rgba(139,92,246,0.08);
   position: fixed;
   top: 64px;
   z-index: 10;

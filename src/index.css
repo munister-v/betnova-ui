@@ -10,9 +10,9 @@
    ───────────────────────────────────────────────────────────────────── */
 
 :root {
-  --bn-bg: #0d0f1a;
-  --bn-surface: #161927;
-  --bn-surface-2: #1f2333;
+  --bn-bg: #05060d;
+  --bn-surface: #0c0e18;
+  --bn-surface-2: #111320;
   --bn-accent: #f59e0b;
   --bn-accent-2: #ec4899;
   --bn-accent-3: #8b5cf6;
@@ -20,7 +20,7 @@
   --bn-success: #4ade80;
   --bn-danger: #ef4444;
   --bn-text: #ffffff;
-  --bn-text-muted: #8b91a5;
+  --bn-text-muted: #7a7f92;
 }
 
 html, body {
@@ -35,19 +35,18 @@ body {
   min-height: 100vh;
 }
 
-/* Animated gradient mesh — fixed full-screen background blobs */
+/* Deep dark background with very subtle colour hints */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(139, 92, 246, 0.15), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 85% 20%, rgba(236, 72, 153, 0.12), transparent 60%),
-    radial-gradient(ellipse 90% 70% at 50% 95%, rgba(245, 158, 11, 0.10), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 100% 80%, rgba(59, 130, 246, 0.10), transparent 60%);
+    radial-gradient(ellipse 70% 50% at 10% 5%,  rgba(139, 92, 246, 0.07), transparent 65%),
+    radial-gradient(ellipse 60% 40% at 90% 15%,  rgba(236, 72, 153, 0.05), transparent 65%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(245, 158, 11, 0.04), transparent 65%);
   pointer-events: none;
-  animation: bgShift 20s ease-in-out infinite alternate;
+  animation: bgShift 30s ease-in-out infinite alternate;
 }
 
 body::after {
@@ -56,10 +55,9 @@ body::after {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 25% 50%, rgba(124, 58, 237, 0.08), transparent 50%),
-    radial-gradient(circle at 75% 30%, rgba(245, 158, 11, 0.06), transparent 50%);
+    radial-gradient(circle at 20% 60%, rgba(124, 58, 237, 0.04), transparent 50%);
   pointer-events: none;
-  animation: bgShift2 25s ease-in-out infinite alternate;
+  animation: bgShift2 35s ease-in-out infinite alternate;
 }
 
 @keyframes bgShift {

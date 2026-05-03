@@ -1,11 +1,8 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
-//assets
-import FULL_LOGO from "../../../../assets/LOGO Gamblify/Full LOGO.png";
-import SMALL_LOGO_NO_BG from "../../../../assets/LOGO Gamblify/LOGO PNG.png";
-// import SMALL_LOGO_BLACK_BG from "../../../../assets/LOGO Gamblify/LOGO.png";
 import { ReactComponent as MESSAGE_ICON } from "../../../../assets/images/message.svg";
+import BetNovaLogo from "../../../Common/BetNovaLogo/BetNovaLogo";
 import ChatBox from "../../ChatBox/ChatBox";
 
 import { AppContext } from "../../../../context/AppContext";
@@ -37,12 +34,14 @@ const NavBar = () => {
       <div
         className="h-16 flex justify-between items-center p-3"
         style={{
-          boxShadow: "2px 2px 2px rgba(0,0,0,0.3)",
           position: "fixed",
           top: "0",
           left: "0",
           right: "0",
-          background: "#1A1D29",
+          background: "rgba(7,8,14,0.97)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(139,92,246,0.12)",
+          boxShadow: "0 2px 24px rgba(0,0,0,0.6)",
           zIndex: 11,
         }}
       >
@@ -51,11 +50,8 @@ const NavBar = () => {
             isTabletScreen ? "logo-container-mobile" : ""
           }`}
         >
-          <Link to="/ " className="flex h-10 flex-shrink-0 cursor-pointer">
-            <img
-              src={isMobileScreen ? SMALL_LOGO_NO_BG : FULL_LOGO}
-              alt="logo"
-            />
+          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <BetNovaLogo size={isMobileScreen ? "sm" : "md"} />
           </Link>
           {/* Rewards Button */}
           {user?.profile && (
