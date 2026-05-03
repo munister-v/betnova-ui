@@ -48,26 +48,24 @@ export function AuthProvider({ children }) {
   // Flag to prevent multiple simultaneous auth checks
   const authCheckInProgress = React.useRef(false)
 
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001'
+
   // Fetch user profile (assumes user is already authenticated)
   const fetchUserProfile = useCallback(async () => {
     try {
-      const response = await gameApi.user.getProfile()
-      if (response.success && response.data) {
-        const profile = response.data
-        setUser(prev => ({
-          ...prev,
-          id: profile.id,
-          email: profile.email,
-          username: profile.username,
-          isAuthenticated: true,
-          isLoading: false,
-          profile: profile,
-          balance: profile.balance
-        }))
-        console.log('✅ User profile loaded:', profile.username)
-      } else {
-        throw new Error('Failed to fetch profile')
-      }
+      const res = await fetch(`${BACKEND_URL}/api/user/profile`, { credentials: 'include' })
+      const profile = await res.json()
+      if (!res.ok || !profile.id) throw new Error('Failed to fetch profile')
+      setUser(prev => ({
+        ...prev,
+        id: profile.id,
+        email: profile.email,
+        username: profile.username,
+        isAuthenticated: true,
+        isLoading: false,
+        profile: profile,
+        balance: profile.balance ?? 0,
+      }))
     } catch (error) {
       console.error('Failed to fetch user profile:', error)
       setUser(prev => ({
@@ -136,13 +134,11 @@ export function AuthProvider({ children }) {
     }
   }, [fetchUserProfile])
 
-  const BACKEND = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001'
-
   // Sign in with email/password — via our backend (no Supabase client needed)
   const signIn = useCallback(async (email, password) => {
     try {
       setIsLoading(true)
-      const res = await fetch(`${BACKEND}/api/auth/login`, {
+      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -163,7 +159,7 @@ export function AuthProvider({ children }) {
   const signUp = useCallback(async (email, password, metadata) => {
     try {
       setIsLoading(true)
-      const res = await fetch(`${BACKEND}/api/auth/register`, {
+      const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
