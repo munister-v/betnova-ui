@@ -513,6 +513,21 @@ export function AuthProvider({ children }) {
     checkAuthStatus()
   }, []) // Empty dependency array - only run once on mount
 
+  // Poll balance every 30s while logged in
+  useEffect(() => {
+    if (!user.isAuthenticated) return
+    const id = setInterval(async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/user/profile`, { credentials: 'include' })
+        const data = await res.json()
+        if (data.id) {
+          setUser(prev => ({ ...prev, balance: data.balance ?? prev.balance }))
+        }
+      } catch (_) {}
+    }, 30000)
+    return () => clearInterval(id)
+  }, [user.isAuthenticated])
+
   const value = {
     user,
     isLoading,
