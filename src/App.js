@@ -58,6 +58,7 @@ import Referrals from "./components/home/Account/Referrals/Referrals";
 import Settings from "./components/home/Account/Settings/Settings";
 import Withdrawals from "./components/home/Account/Withdrawals/Withdrawals";
 import VIP from "./components/home/Account/VIP/VIP";
+import TransactionHistory from "./components/home/Account/TransactionHistory/TransactionHistory";
 import SlotsGame from "./components/Pages/Casino/SlotsGame";
 import PageLayout from "./components/home/MainHome/PageLayout";
 import {
@@ -124,6 +125,7 @@ const routesAccountLayout = [
   { path: "/account/withdrawals/:tab", component: Withdrawals },
   { path: "/account/settings", component: Settings },
   { path: "/account/vip/:tab", component: VIP },
+  { path: "/account/history", component: TransactionHistory },
 ];
 
 function App() {

@@ -37,6 +37,11 @@ const links = [
     label: "Withdrawals",
   },
   {
+    to: "/account/history",
+    icon: BUGER,
+    label: "History",
+  },
+  {
     to: "/account/settings",
     icon: GEAR,
     label: "Settings",

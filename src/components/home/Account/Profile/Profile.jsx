@@ -21,6 +21,39 @@ import { gameApi } from "@/lib/api";
 import supabase from "@/lib/supabase";
 import { pinata } from "@/lib/pinata";
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+
+function StatsSection() {
+  const [stats, setStats] = React.useState(null);
+  React.useEffect(() => {
+    fetch(`${BACKEND_URL}/api/game-history/user/stats`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.success) setStats(d); })
+      .catch(() => {});
+  }, []);
+
+  const items = [
+    { label: 'Total Games', value: stats?.totalGames ?? '—' },
+    { label: 'Total Wagered', value: stats ? `$${stats.totalWagered.toFixed(2)}` : '—' },
+    { label: 'Total Profit', value: stats ? `$${stats.totalProfit.toFixed(2)}` : '—', color: stats?.totalProfit >= 0 ? '#4ade80' : '#f87171' },
+    { label: 'Win Rate', value: stats ? `${stats.winRate}%` : '—' },
+  ];
+
+  return (
+    <div className="section-container">
+      <h3 className="section-title">Statistics</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+        {items.map(item => (
+          <div key={item.label} style={{ padding: '16px', borderRadius: 10, background: 'rgba(15,17,26,0.55)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ color: '#676D7C', fontSize: 11, textTransform: 'uppercase', marginBottom: 6 }}>{item.label}</div>
+            <div style={{ color: item.color || '#fff', fontSize: 20, fontWeight: 700 }}>{item.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const Profile = () => {
   const { user, refreshProfile, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -240,6 +273,9 @@ const Profile = () => {
       <AccountPageTitle icon={USER} title="Profile" />
 
       <UserContainer />
+
+      {/* Stats section */}
+      <StatsSection />
 
       {/* Avatar Section */}
       <div className="section-container">
