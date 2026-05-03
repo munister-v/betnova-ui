@@ -2,14 +2,34 @@ import styled from "styled-components";
 import BANNER_IMG from "../../../assets/images/banner-image.png";
 
 export const StyledBanner = styled.div`
-  background-image: url(${BANNER_IMG});
+  background-image:
+    linear-gradient(135deg, rgba(139, 92, 246, 0.55) 0%, rgba(236, 72, 153, 0.45) 50%, rgba(245, 158, 11, 0.5) 100%),
+    url(${BANNER_IMG});
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: 8px;
+  background-position: center;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
+  box-shadow:
+    0 12px 40px rgba(139, 92, 246, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12), transparent 50%);
+    pointer-events: none;
+  }
+
+  .main-heading {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  }
 
   .main-content {
     display: flex;

@@ -5,30 +5,237 @@
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   BetNova theme — vibrant gradient mesh background + glowing accents
+   ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bn-bg: #0d0f1a;
+  --bn-surface: #161927;
+  --bn-surface-2: #1f2333;
+  --bn-accent: #f59e0b;
+  --bn-accent-2: #ec4899;
+  --bn-accent-3: #8b5cf6;
+  --bn-accent-4: #3b82f6;
+  --bn-success: #4ade80;
+  --bn-danger: #ef4444;
+  --bn-text: #ffffff;
+  --bn-text-muted: #8b91a5;
+}
+
+html, body {
+  background: var(--bn-bg);
+  color: var(--bn-text);
+}
+
 body {
   font-family: "Geogrotesque Cyr SemiBold", sans-serif;
-  background-color: #1a1d29;
+  background-color: var(--bn-bg);
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Animated gradient mesh — fixed full-screen background blobs */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(139, 92, 246, 0.15), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% 20%, rgba(236, 72, 153, 0.12), transparent 60%),
+    radial-gradient(ellipse 90% 70% at 50% 95%, rgba(245, 158, 11, 0.10), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 80%, rgba(59, 130, 246, 0.10), transparent 60%);
+  pointer-events: none;
+  animation: bgShift 20s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 25% 50%, rgba(124, 58, 237, 0.08), transparent 50%),
+    radial-gradient(circle at 75% 30%, rgba(245, 158, 11, 0.06), transparent 50%);
+  pointer-events: none;
+  animation: bgShift2 25s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-3%, 2%) scale(1.05); }
+  100% { transform: translate(2%, -3%) scale(1.02); }
+}
+
+@keyframes bgShift2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-4%, -2%) scale(1.08); }
 }
 
 html {
   overflow-x: hidden;
   scroll-padding-top: 9rem;
-  /* scroll-behavior: smooth; */
 }
 
-html::-webkit-scrollbar {
-  width: 0.6rem;
-}
-
-html::-webkit-scrollbar-track {
-  background: #1a1d29;
-}
-
+/* Scrollbar */
+html::-webkit-scrollbar { width: 0.6rem; }
+html::-webkit-scrollbar-track { background: var(--bn-bg); }
 html::-webkit-scrollbar-thumb {
   border-radius: 6px;
-  background: rgba(203, 215, 255, 0.08);
+  background: linear-gradient(180deg, var(--bn-accent-3), var(--bn-accent-2));
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--bn-accent-2), var(--bn-accent));
 }
 
-.uppercase {
-  text-transform: uppercase;
+.uppercase { text-transform: uppercase; }
+
+/* ─── Global UI polish ─────────────────────────────────────────────── */
+
+/* All buttons get a subtle shine on hover */
+button:not(:disabled) {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+button:not(:disabled):hover {
+  filter: brightness(1.12);
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* Inputs glow on focus */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 16px rgba(245, 158, 11, 0.15);
+  border-color: var(--bn-accent) !important;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+/* Glow utility classes */
+.bn-glow-yellow { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+.bn-glow-purple { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+.bn-glow-pink   { box-shadow: 0 0 20px rgba(236, 72, 153, 0.4); }
+.bn-glow-blue   { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+
+/* Glass effect */
+.bn-glass {
+  background: rgba(22, 25, 39, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Override flat dark surface backgrounds globally — softer, more depth */
+[style*="background: rgba(15, 17, 26, 0.55)"],
+[style*="background: rgba(15,17,26,0.55)"],
+[style*="background: rgba(15, 17, 26, 0.8)"],
+[style*="background: rgba(15,17,26,0.8)"] {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Toastify polish */
+.Toastify__toast {
+  background: linear-gradient(135deg, rgba(31, 35, 51, 0.95), rgba(22, 25, 39, 0.95)) !important;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(139, 92, 246, 0.15);
+  color: #fff !important;
+}
+.Toastify__toast--success { border-left: 3px solid var(--bn-success); }
+.Toastify__toast--error   { border-left: 3px solid var(--bn-danger); }
+.Toastify__toast--info    { border-left: 3px solid var(--bn-accent-4); }
+
+/* Pulsing animation for hot/live elements */
+@keyframes bnPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.05); }
+}
+.bn-pulse { animation: bnPulse 2s ease-in-out infinite; }
+
+/* Shine sweep for premium buttons */
+@keyframes bnShine {
+  0%   { background-position: -200% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Card hover lift baseline (works on any element with .bn-card) */
+.bn-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bn-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(139, 92, 246, 0.2);
+}
+
+/* Header / nav glassy override */
+.css-fixed-nav, [class*="StyledNavBar"] > div:first-child {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 15, 26, 0.75) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Sidebar polish */
+[class*="StyledOpenedSidebar"] {
+  background: linear-gradient(180deg, rgba(22, 25, 39, 0.95), rgba(13, 15, 26, 0.98)) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* All "page containers" get a soft inner glow */
+[class*="StyledPageContainer"], [class*="StyleAccountLayout"] {
+  position: relative;
+}
+
+/* Active/selected nav links — colored bar */
+.active-link, .active-option, .active-icon {
+  position: relative;
+}
+
+/* Section title accent */
+.section-title {
+  position: relative;
+  padding-left: 14px !important;
+}
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--bn-accent), var(--bn-accent-2));
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+/* Live wins section — pulse the dot */
+.dot-icon {
+  animation: bnPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px var(--bn-success));
+}
+
+/* Live wins title accent */
+.live-wins-text {
+  background: linear-gradient(90deg, var(--bn-accent), var(--bn-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+/* Number badges (balance, etc) */
+.money-container, [class*="TotalMoneyContainer"] {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(236, 72, 153, 0.1)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+/* Selection highlight */
+::selection {
+  background: rgba(245, 158, 11, 0.4);
+  color: #fff;
 }

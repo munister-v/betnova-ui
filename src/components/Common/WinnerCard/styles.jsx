@@ -12,14 +12,17 @@ export const StyledWinnerCard = styled.div`
   }
 
   .card-content {
-    border-radius: 8px;
+    border-radius: 12px;
     min-width: 130px;
     height: 178px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(203, 215, 255, 0.03);
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.08), rgba(15, 17, 26, 0.6));
+    border: 1px solid rgba(139, 92, 246, 0.15);
     gap: 12px;
+    transition: all 0.2s ease;
+    overflow: hidden;
 
     .card-image {
       width: 115px;

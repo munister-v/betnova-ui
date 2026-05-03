@@ -30,23 +30,26 @@ const CashierModal = ({ button }) => {
               alignItems: "flex-start",
               gap: "10px",
               borderRadius: "8px",
-              background: "#FFE81A",
-              boxShadow: "0px 0px 10px 0px rgba(255, 176, 25, 0.40)",
+              background: "linear-gradient(135deg, #f59e0b, #ec4899)",
+              boxShadow: "0 4px 20px rgba(245, 158, 11, 0.5), 0 0 0 1px rgba(245, 158, 11, 0.3)",
               cursor: "pointer",
+              transition: "transform 0.15s, box-shadow 0.15s",
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(245, 158, 11, 0.7), 0 0 0 1px rgba(245, 158, 11, 0.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(245, 158, 11, 0.5), 0 0 0 1px rgba(245, 158, 11, 0.3)"; }}
           >
             <p
               style={{
-                color: "#141722",
+                color: "#fff",
                 fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "400",
+                fontWeight: "700",
                 lineHeight: "16.8px",
                 letterSpacing: "0.5px",
                 textTransform: "uppercase",
+                textShadow: "0 1px 2px rgba(0,0,0,0.3)",
               }}
             >
-              Cashier
+              💰 Cashier
             </p>
           </div>
         ) : (
@@ -58,22 +61,25 @@ const CashierModal = ({ button }) => {
               alignItems: "flex-start",
               gap: "10px",
               borderRadius: "8px",
-              background: "rgba(203, 215, 255, 0.08)",
+              background: "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))",
+              border: "1px solid rgba(139, 92, 246, 0.4)",
               cursor: "pointer",
+              transition: "all 0.15s",
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = "linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.35))"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.7)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.4)"; }}
           >
             <p
               style={{
                 color: "#fff",
                 fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "400",
+                fontWeight: "600",
                 lineHeight: "16.8px",
                 letterSpacing: "0.5px",
                 textTransform: "uppercase",
               }}
             >
-              Buy Crypto
+              ₿ Buy Crypto
             </p>
           </div>
         )

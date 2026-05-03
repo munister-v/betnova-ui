@@ -21,12 +21,20 @@ export const StyledRegisterModal = styled.div`
     font-weight: 800;
     font-style: normal;
     font-size: 14px;
-    color: rgb(20, 23, 34);
-    background: rgb(255, 232, 26);
-    box-shadow: rgba(255, 176, 25, 0.4) 0px 0px 10px,
-      rgba(255, 255, 255, 0.2) 0px 1px 0px inset,
-      rgba(0, 0, 0, 0.15) 0px -3px 0px inset,
-      rgb(255, 135, 25) 0px 0px 15px inset;
+    color: #fff;
+    background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    box-shadow:
+      0 8px 24px rgba(236, 72, 153, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+      0 1px 0 rgba(255, 255, 255, 0.25) inset;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    animation: btnShine 4s ease-in-out infinite;
+
+    @keyframes btnShine {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
     width: 100%;
     margin: 24px 0px;
 
