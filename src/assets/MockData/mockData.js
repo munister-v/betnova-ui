@@ -61,7 +61,7 @@ import NFT_Banner from "./../../assets/images/nft-banner.png";
 
 export const SECTIONS = [
   {
-    name: "PLAY AK GAMES",
+    name: "PLAY BETNOVA",
     selectedOption: null,
     options: [
       {
@@ -74,8 +74,8 @@ export const SECTIONS = [
         dropdownOptions: [
           {
             icon: AK_ORIGINALS,
-            text: "AK Originals",
-            sidebarUrl: "/ak-originals",
+            text: "BetNova Originals",
+            sidebarUrl: "/casino",
           },
           {
             icon: BONUS_BATTLES,
@@ -182,7 +182,7 @@ export const SECTIONS = [
     options: [
       {
         icon: LOTTERY_IMG,
-        text: "AK Lottery",
+        text: "Lottery",
         number: "$5.03K",
         count: "64",
         sidebarUrl: "/ak-lottery",
@@ -195,6 +195,7 @@ export const SECTIONS = [
         sidebarUrl: "/jackpot",
       },
       { icon: VIDEO_IMG, text: "Streams", sidebarUrl: "/streams" },
+      { icon: AWARD_IMG, text: "Leaderboard", sidebarUrl: "/leaderboard" },
     ],
   },
   {
