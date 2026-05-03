@@ -69,7 +69,6 @@ import NavBar from "./components/home/header/NavBar/NavBar";
 import SideBar from "./components/home/header/SideBar";
 
 const routesSportsLayout = [
-  { path: "/sports", component: Sports },
   { path: "/nft/marketplace", component: Marketplace },
   { path: "/nft/marketplace/my-sales", component: NFTMySales },
   { path: "/nft/marketplace/my-purchases", component: NFTMyPurchases },
@@ -85,7 +84,7 @@ const routesSportsLayout = [
   // Add more routes as needed
 ];
 
-const routesBets = [{ path: "/my-bets", component: MyBets }];
+const routesBets = [];
 
 const routesContentLayout = [
   { path: "/", component: HomeAppBar },

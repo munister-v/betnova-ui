@@ -113,7 +113,7 @@ const MineGame = () => {
     if (!game) return;
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND}/api/mine/${game.id}/reveal`, {
+      const res = await fetch(`${BACKEND}/api/mine/game/${game.id}/reveal`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -149,7 +149,7 @@ const MineGame = () => {
     if (!game) return;
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND}/api/mine/${game.id}/cashout`, {
+      const res = await fetch(`${BACKEND}/api/mine/game/${game.id}/cashout`, {
         method: "POST",
         credentials: "include",
       });

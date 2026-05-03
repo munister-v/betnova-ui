@@ -113,17 +113,6 @@ export const SECTIONS = [
         ],
       },
       {
-        icon: SPORTS_IMG,
-        text: "Sports",
-        hasDropdown: true,
-        selectedSubOption: null,
-        isOpenedDropdown: false,
-        sidebarUrl: "/sports",
-        dropdownOptions: [
-          { icon: MY_BETS, text: "My Bets", sidebarUrl: "/my-bets" },
-        ],
-      },
-      {
         icon: NFT_IMG,
         text: "NFT",
         hasDropdown: true,
