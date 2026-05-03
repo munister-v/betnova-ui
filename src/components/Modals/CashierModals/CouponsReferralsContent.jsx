@@ -1,105 +1,114 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 import { StyledCouponsContent } from "./styles";
 
+const BACKEND = process.env.REACT_APP_BACKEND_URL || "http://localhost:3001";
+
 const CouponsReferralsContent = ({ option }) => {
+  const { user, updateBalance } = useAuth();
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const isCoupons = option === "Coupons";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!code.trim()) return toast.error("Please enter a code");
+    if (!user?.isAuthenticated) return toast.error("Please log in first");
+
+    setLoading(true);
+
+    try {
+      if (isCoupons) {
+        const res = await fetch(`${BACKEND}/api/promo/redeem`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success(`🎉 ${data.message}`);
+          if (typeof updateBalance === "function") updateBalance(data.newBalance);
+          setCode("");
+        } else {
+          toast.error(data.error || "Failed to redeem code");
+        }
+      } else {
+        // Referral
+        const res = await fetch(`${BACKEND}/api/referrals/apply`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success("✅ Referral code applied!");
+          setCode("");
+        } else {
+          toast.error(data.error || "Invalid referral code");
+        }
+      }
+    } catch (err) {
+      toast.error("Network error");
+    }
+    setLoading(false);
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <StyledCouponsContent>
-        <img
-          src={
-            option === "Coupons"
-              ? "https://rollbit.com/static/media/coupon.5448383faf0dfbd2c111.png"
-              : "https://rollbit.com/static/media/coin.c832c5bf7167a98755e1.webp"
-          }
-          size="153"
-          className="css-1ges8if"
-          style={{ margin: "24px 0px 32px" }}
-          alt=""
-        />
+        <div style={{
+          width: "120px",
+          height: "120px",
+          margin: "24px auto 32px",
+          borderRadius: "50%",
+          background: isCoupons ? "rgba(245,158,11,0.15)" : "rgba(124,58,237,0.15)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "60px",
+        }}>
+          {isCoupons ? "🎟️" : "🤝"}
+        </div>
+
         <h1 className="title">
-          {option === "Coupons" ? "Redeem Coupon Code" : "Apply referral code"}
+          {isCoupons ? "Redeem Promo Code" : "Apply Referral Code"}
         </h1>
+
         <div className="input-container">
           <input
             type="text"
-            name="name"
-            placeholder={
-              option === "Coupons"
-                ? "Enter Coupon Code..."
-                : "Enter Referral Code..."
-            }
-            value=""
+            name="code"
+            placeholder={isCoupons ? "Enter promo code..." : "Enter referral code..."}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            autoComplete="off"
+            style={{ textTransform: "uppercase" }}
           />
         </div>
-        <div className="info-text">
-          {option === "Coupons"
-            ? "We regularly post these on our"
-            : 'Don\'t have a code? Enter "Rollbit"'}{" "}
-          {option === "Coupons" && (
-            <a
-              href="https://twitter.com/rollbitcom"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Twitter
-            </a>
-          )}
+
+        <div className="info-text" style={{ textAlign: "center", marginTop: "12px" }}>
+          {isCoupons
+            ? <>Try <strong style={{ color: "#f59e0b" }}>WELCOME5</strong>, <strong style={{ color: "#f59e0b" }}>BETNOVA10</strong>, or <strong style={{ color: "#f59e0b" }}>LUCKY1</strong></>
+            : <>Don't have a code? Ask a friend!</>
+          }
         </div>
-        <div id="recaptcha2069">
-          <div
-            className="grecaptcha-badge"
-            data-style="bottomright"
-            style={{
-              width: "256px",
-              height: "60px",
-              position: "fixed",
-              visibility: "hidden",
-              display: "block",
-              transition: "right 0.3s ease 0s",
-              bottom: "14px",
-              right: "-186px",
-              boxShadow: "gray 0px 0px 5px",
-              borderRadius: "2px",
-              overflow: "hidden",
-            }}
-          >
-            <div className="grecaptcha-logo">
-              <iframe
-                title="reCAPTCHA"
-                width="256"
-                height="60"
-                role="presentation"
-                name="a-c035ti8nb037"
-                frameBorder="0"
-                scrolling="no"
-                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"
-                src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LcLy4QaAAAAAJTsyzu-3Vy0vM7N1rs71trH38oG&amp;co=aHR0cHM6Ly9/rollbit.com:443."
-              ></iframe>
-            </div>
-            <div className="grecaptcha-error"></div>
-            <textarea
-              id="g-recaptcha-response-100004"
-              name="g-recaptcha-response"
-              className="g-recaptcha-response"
-              style={{
-                width: "250px",
-                height: "40px",
-                border: "1px solid rgb(193, 193, 193)",
-                margin: "10px 25px",
-                padding: "0px",
-                resize: "none",
-                display: "none",
-              }}
-            ></textarea>
-          </div>
-          {/* <iframe style={{ display: "none" }}></iframe> */}
-        </div>
+
         <button
           className="claim-button"
           type="submit"
-          style={{ width: "140px", marginTop: "40px" }}
+          disabled={loading || !code.trim()}
+          style={{
+            width: "180px",
+            marginTop: "32px",
+            opacity: loading || !code.trim() ? 0.6 : 1,
+            cursor: loading || !code.trim() ? "not-allowed" : "pointer",
+          }}
         >
-          {option === "Coupons" ? "Claim" : "Apply"}
+          {loading ? "..." : (isCoupons ? "Claim" : "Apply")}
         </button>
       </StyledCouponsContent>
     </form>
