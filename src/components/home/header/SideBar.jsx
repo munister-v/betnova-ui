@@ -167,26 +167,29 @@ const SideBar = () => {
           <DailyBonus />
         </div>
 
-        {/* Provably Fair link */}
-        <div style={{ padding: "0 12px", marginBottom: 12 }}>
-          <Link to="/fairness" style={{ textDecoration: "none" }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "11px 14px", borderRadius: 10,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              cursor: "pointer", transition: "background 0.2s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(139,92,246,0.1)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
-            >
-              <span style={{ fontSize: 18 }}>🔐</span>
-              <div>
-                <div style={{ color: "#c4b5fd", fontSize: 12, fontWeight: 700 }}>Provably Fair</div>
-                <div style={{ color: "#676D7C", fontSize: 10, marginTop: 1 }}>Verify any game outcome</div>
+        {/* Quick links row */}
+        <div style={{ padding: "0 12px", marginBottom: 12, display: "flex", gap: 8 }}>
+          {[
+            { to: "/leaderboard", emoji: "🏆", label: "Leaderboard",   sub: "Top players",          color: "#fbbf24" },
+            { to: "/fairness",    emoji: "🔐", label: "Provably Fair", sub: "Verify outcomes",       color: "#c4b5fd" },
+          ].map(item => (
+            <Link key={item.to} to={item.to} style={{ textDecoration: "none", flex: 1 }}>
+              <div style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                padding: "12px 8px", borderRadius: 10,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                cursor: "pointer", transition: "background 0.2s", textAlign: "center",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
+              >
+                <span style={{ fontSize: 20 }}>{item.emoji}</span>
+                <div style={{ color: item.color, fontSize: 11, fontWeight: 700 }}>{item.label}</div>
+                <div style={{ color: "#555", fontSize: 10 }}>{item.sub}</div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          ))}
         </div>
 
         <div className="payment">
