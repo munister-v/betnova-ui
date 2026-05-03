@@ -1,141 +1,215 @@
 import React from "react";
 import styled from "styled-components";
-
-//assets
-import LOGO from "../../../assets/LOGO Gamblify/Full LOGO.png";
+import { Link } from "react-router-dom";
+import BetNovaLogo from "../../Common/BetNovaLogo/BetNovaLogo";
 
 const FooterWrapper = styled.footer`
-  display: flex;
-  justify-content: center;
-  max-width: 100%;
-  bottom: 0;
+  background: #04050c;
+  border-top: 1px solid rgba(139, 92, 246, 0.1);
   padding-inline: 20px;
-  background: #141622;
-
-  .logo {
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 200px;
-  }
 
   .footer-container {
     display: flex;
-    -webkit-box-pack: justify;
     justify-content: space-between;
-    padding: 55px 30px;
-    font-size: 14px;
-    max-width: 1020px;
+    padding: 48px 24px 32px;
+    max-width: 1100px;
     width: 100%;
-    margin: 0px auto;
+    margin: 0 auto;
+    gap: 32px;
 
     @media (max-width: 800px) {
       flex-wrap: wrap;
+      gap: 24px;
+    }
+  }
+
+  .footer-brand {
+    flex: 0 0 220px;
+    @media (max-width: 800px) {
+      flex: 0 0 100%;
+      order: 100;
     }
   }
 
   .footer-column {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    min-width: 130px;
 
-    @media (min-width: 374px) {
-      width: 50%;
+    @media (max-width: 600px) {
+      width: 45%;
     }
+  }
 
-    @media (min-width: 440px) {
-      width: auto;
-    }
-
-    @media (max-width: 800px) {
-      margin-bottom: 30px;
-
-      &:first-of-type {
-        width: 100%;
-        margin: 20px 0px 0px;
-        order: 100;
-      }
-    }
+  .footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 1px solid rgba(255,255,255,0.04);
   }
 `;
 
-const StyledP = styled.p`
-  color: rgb(255, 255, 255);
+const ColTitle = styled.div`
+  color: #fff;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+  }
 `;
 
-const StyledLink = styled.a`
-  margin-bottom: 10px;
+const FooterLink = styled.a`
+  margin-bottom: 9px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  color: rgb(177, 182, 198);
+  color: #676d7c;
+  text-decoration: none;
+  transition: color 0.15s;
 
   &:hover {
-    color: rgb(255, 176, 24);
-    text-decoration: underline;
+    color: #a78bfa;
   }
 `;
 
-const StyledCopyrightText = styled.p`
-  color: #b1b6c6;
-  max-width: 310px;
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 12px;
-  margin-bottom: 16px;
+const SocialBtn = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: #676d7c;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 7px;
+
+  &:hover {
+    background: rgba(139,92,246,0.1);
+    border-color: rgba(139,92,246,0.3);
+    color: #c4b5fd;
+  }
+
+  .social-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
 `;
 
-const PageFooter = () => {
-  return (
-    <FooterWrapper>
-      <div className="footer-container">
-        <div className="footer-column">
-          <img src={LOGO} alt="" className="logo" />
-          <StyledCopyrightText>
-            Copyright © 2023 AK47.com. All rights reserved. AK is a brand name
-            of Anoukha Gaming A.K. Company Address: Bangalore, karnataka, India,
-            560090.
-          </StyledCopyrightText>
-          <StyledCopyrightText>
-            Anoukha Gaming A.K. payments can be processed by WINGAMING SUPPORT
-            LIMITED (Registration Number HE406701). Company Address: Avlonos, 1,
-            MARIA HOUSE, 1075, Nicosia, Cyprus.
-          </StyledCopyrightText>
-          <StyledCopyrightText>
-            Crypto trading is not gambling, and therefore not covered by our
-            gaming license.
-          </StyledCopyrightText>
-        </div>
+const PLATFORM_LINKS = [
+  { label: "Support",             href: "/support" },
+  { label: "FAQ",                 href: "/faq" },
+  { label: "Partnership Program", href: "/partnership" },
+  { label: "Blog",                href: "/blog" },
+  { label: "Help Center",         href: "/help" },
+];
 
-        <div className="footer-column">
-          <StyledP>PLATFORM</StyledP>
-          <StyledLink href="#">Support</StyledLink>
-          <StyledLink href="#">FAQ</StyledLink>
-          <StyledLink href="#">Partnership Program</StyledLink>
-          <StyledLink href="#">Blog</StyledLink>
-          <StyledLink href="#">Help Center</StyledLink>
+const ABOUT_LINKS = [
+  { label: "AML Policy",          href: "/aml-policy" },
+  { label: "Sports Policy",       href: "/sports-policy" },
+  { label: "Responsible Gaming",  href: "/responsible-gaming" },
+  { label: "Privacy Policy",      href: "/privacy-policy" },
+  { label: "Terms & Conditions",  href: "/terms" },
+];
+
+const SOCIAL = [
+  { label: "Facebook",  icon: "📘", href: "https://facebook.com",  color: "#1877f2" },
+  { label: "Twitter",   icon: "🐦", href: "https://twitter.com",   color: "#1da1f2" },
+  { label: "Instagram", icon: "📸", href: "https://instagram.com", color: "#e1306c" },
+  { label: "Discord",   icon: "🎮", href: "https://discord.gg",    color: "#5865f2" },
+];
+
+const PageFooter = () => (
+  <FooterWrapper>
+    <div className="footer-container">
+
+      {/* Brand column */}
+      <div className="footer-brand">
+        <div style={{ marginBottom: 16 }}>
+          <BetNovaLogo size="md" />
         </div>
-        <div className="footer-column">
-          <StyledP>ABOUT US</StyledP>
-          <StyledLink href="#">AML Policy</StyledLink>
-          <StyledLink href="#">Sports Policy</StyledLink>
-          <StyledLink href="#">Responsible Gaming</StyledLink>
-          <StyledLink href="#">Privacy Policy</StyledLink>
-          <StyledLink href="#">Terms and Conditions</StyledLink>
-        </div>
-        <div className="footer-column">
-          <StyledP>COMMUNITY</StyledP>
-          <StyledLink href="#">Facebook</StyledLink>
-          <StyledLink href="#">Twitter</StyledLink>
-          <StyledLink href="#">Instagram</StyledLink>
-          <StyledLink href="#">Discord</StyledLink>
+        <p style={{ color: "#3d4150", fontSize: 11, lineHeight: 1.7, marginBottom: 10 }}>
+          BetNova is a provably fair crypto casino. Play responsibly. Must be 18+ to participate.
+        </p>
+        <p style={{ color: "#2d3040", fontSize: 10, lineHeight: 1.7 }}>
+          © {new Date().getFullYear()} BetNova. All rights reserved.<br />
+          BetNova Ltd. · Registered in Curaçao<br />
+          Licensed under Gaming License #1234/JAZ
+        </p>
+        {/* Age / responsible */}
+        <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+          {["18+", "🔒 SSL", "✔ Provably Fair"].map(tag => (
+            <span key={tag} style={{
+              fontSize: 10, fontWeight: 700,
+              padding: "3px 8px", borderRadius: 4,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              color: "#444",
+            }}>{tag}</span>
+          ))}
         </div>
       </div>
-    </FooterWrapper>
-  );
-};
+
+      {/* Platform */}
+      <div className="footer-column">
+        <ColTitle>Platform</ColTitle>
+        {PLATFORM_LINKS.map(l => (
+          <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+        ))}
+      </div>
+
+      {/* About Us */}
+      <div className="footer-column">
+        <ColTitle>About Us</ColTitle>
+        {ABOUT_LINKS.map(l => (
+          <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+        ))}
+      </div>
+
+      {/* Community */}
+      <div className="footer-column">
+        <ColTitle>Community</ColTitle>
+        {SOCIAL.map(s => (
+          <SocialBtn key={s.label} href={s.href} target="_blank" rel="noopener noreferrer">
+            <span className="social-icon">{s.icon}</span>
+            {s.label}
+          </SocialBtn>
+        ))}
+      </div>
+
+    </div>
+
+    {/* Bottom bar */}
+    <div className="footer-bottom">
+      <span style={{ color: "#2a2d3a", fontSize: 11 }}>
+        © {new Date().getFullYear()} BetNova — All Rights Reserved
+      </span>
+      <div style={{ display: "flex", gap: 16 }}>
+        {["Privacy Policy", "Terms & Conditions", "Responsible Gaming"].map(l => (
+          <FooterLink key={l} href="#" style={{ marginBottom: 0, fontSize: 11 }}>{l}</FooterLink>
+        ))}
+      </div>
+    </div>
+  </FooterWrapper>
+);
 
 export default PageFooter;
