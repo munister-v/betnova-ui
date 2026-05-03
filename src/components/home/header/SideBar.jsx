@@ -85,6 +85,19 @@ const SideBar = () => {
   if (isTabletScreen && !isSidebarOpen) return null;
 
   return isSidebarOpen ? (
+    <>
+      {isTabletScreen && (
+        <div
+          onClick={() => updateSidebar(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            top: 65,
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 9,
+          }}
+        />
+      )}
     <StyledOpenedSidebar>
       <div className="sidebar-content">
         <div>
@@ -159,6 +172,7 @@ const SideBar = () => {
         </div>
       </div>
     </StyledOpenedSidebar>
+    </>
   ) : (
     <SideBarClosed toggleSideBar={updateSidebar} />
   );
