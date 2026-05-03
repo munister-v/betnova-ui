@@ -1,26 +1,30 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
 
 const BACKEND = process.env.REACT_APP_BACKEND_URL || "http://localhost:3001";
 
-const ALL_SYMBOLS = ["🍒", "🍋", "🍊", "🍇", "⭐", "💎", "7️⃣"];
+// Each game has its own visual theme & symbol set. Symbols are fetched from
+// `/api/slots/games`, but for the spinning animation we keep a fallback set.
 
-const PAYTABLE = [
-  { symbol: "7️⃣", pay3: "50x" },
-  { symbol: "💎", pay3: "25x" },
-  { symbol: "⭐", pay3: "15x" },
-  { symbol: "🍇", pay3: "8x" },
-  { symbol: "🍊", pay3: "5x" },
-  { symbol: "🍋", pay3: "3x" },
-  { symbol: "🍒", pay3: "2x", pay2: "0.5x" },
-];
+const FALLBACK_SYMBOLS = ["🍒", "🍋", "🍊", "🍇", "⭐", "💎", "7️⃣"];
 
-function ReelColumn({ symbols, spinning, result, delay }) {
+const THEMES = {
+  classic: { primary: "#f59e0b", secondary: "#ef4444", bg: "linear-gradient(135deg, #f59e0b22, #ef444422)", glow: "rgba(245,158,11,0.6)" },
+  bonanza: { primary: "#ec4899", secondary: "#8b5cf6", bg: "linear-gradient(135deg, #ec489922, #8b5cf622)", glow: "rgba(236,72,153,0.6)" },
+  egypt:   { primary: "#facc15", secondary: "#d97706", bg: "linear-gradient(135deg, #facc1522, #92400e22)", glow: "rgba(250,204,21,0.6)" },
+  dragon:  { primary: "#dc2626", secondary: "#facc15", bg: "linear-gradient(135deg, #dc262622, #facc1522)", glow: "rgba(220,38,38,0.6)" },
+  pirate:  { primary: "#06b6d4", secondary: "#0891b2", bg: "linear-gradient(135deg, #06b6d422, #0e749022)", glow: "rgba(6,182,212,0.6)" },
+  space:   { primary: "#8b5cf6", secondary: "#3b82f6", bg: "linear-gradient(135deg, #8b5cf622, #3b82f622)", glow: "rgba(139,92,246,0.6)" },
+  vegas:   { primary: "#ef4444", secondary: "#f59e0b", bg: "linear-gradient(135deg, #ef444422, #f59e0b22)", glow: "rgba(239,68,68,0.6)" },
+  jungle:  { primary: "#16a34a", secondary: "#84cc16", bg: "linear-gradient(135deg, #16a34a22, #84cc1622)", glow: "rgba(22,163,74,0.6)" },
+};
+
+function ReelColumn({ allSymbols, spinning, result }) {
   return (
     <div style={{
       width: 90, height: 270, borderRadius: 12, overflow: "hidden",
-      background: "rgba(10,12,20,0.8)", border: "2px solid rgba(255,255,255,0.08)",
+      background: "rgba(10,12,20,0.9)", border: "2px solid rgba(255,255,255,0.08)",
       position: "relative", display: "flex", flexDirection: "column",
     }}>
       {spinning ? (
@@ -29,7 +33,7 @@ function ReelColumn({ symbols, spinning, result, delay }) {
           animation: `slotSpin 0.1s linear infinite`,
           display: "flex", flexDirection: "column",
         }}>
-          {[...ALL_SYMBOLS, ...ALL_SYMBOLS, ...ALL_SYMBOLS].map((s, i) => (
+          {[...allSymbols, ...allSymbols, ...allSymbols].map((s, i) => (
             <div key={i} style={{ height: 90, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>{s}</div>
           ))}
         </div>
@@ -37,7 +41,8 @@ function ReelColumn({ symbols, spinning, result, delay }) {
         (result || ["❓", "❓", "❓"]).map((sym, i) => (
           <div key={i} style={{
             height: 90, display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 40, borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none",
+            fontSize: 44, borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none",
+            filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
           }}>{sym}</div>
         ))
       )}
@@ -45,13 +50,30 @@ function ReelColumn({ symbols, spinning, result, delay }) {
   );
 }
 
-const SlotsGame = () => {
+const SlotsGame = ({ gameId = "classic", title }) => {
   const { user, updateBalance } = useAuth();
   const [bet, setBet] = useState("1");
   const [spinning, setSpinning] = useState(false);
-  const [grid, setGrid] = useState(null); // 9 symbols flat array
+  const [grid, setGrid] = useState(null);
   const [lastResult, setLastResult] = useState(null);
   const [history, setHistory] = useState([]);
+  const [config, setConfig] = useState(null);
+
+  const theme = THEMES[gameId] || THEMES.classic;
+
+  useEffect(() => {
+    fetch(`${BACKEND}/api/slots/config?gameId=${gameId}`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setConfig(data); })
+      .catch(() => {});
+  }, [gameId]);
+
+  const allSymbols = config?.symbols?.map(s => s.emoji) || FALLBACK_SYMBOLS;
+
+  const paytable = (config?.symbols || [])
+    .slice()
+    .sort((a, b) => b.pay3 - a.pay3)
+    .map(s => ({ symbol: s.emoji, pay3: `${s.pay3}x`, pay2: s.pay2 > 0 ? `${s.pay2}x` : null }));
 
   const handleSpin = async () => {
     if (spinning) return;
@@ -67,11 +89,10 @@ const SlotsGame = () => {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ betAmount }),
+        body: JSON.stringify({ betAmount, gameId }),
       });
       const data = await res.json();
 
-      // Keep spinning for 1.5s minimum
       await new Promise(r => setTimeout(r, 1500));
 
       if (!data.success) {
@@ -97,7 +118,6 @@ const SlotsGame = () => {
     }
   };
 
-  // Split flat 9-symbol grid into 3 reels of 3 symbols each
   const reels = grid
     ? [[grid[0], grid[3], grid[6]], [grid[1], grid[4], grid[7]], [grid[2], grid[5], grid[8]]]
     : [null, null, null];
@@ -112,23 +132,31 @@ const SlotsGame = () => {
           100% { transform: translateY(-90px); }
         }
         @keyframes winPulse {
-          0%,100% { box-shadow: 0 0 0 rgba(245,158,11,0); }
-          50% { box-shadow: 0 0 24px rgba(245,158,11,0.6); }
+          0%,100% { box-shadow: 0 0 0 ${theme.glow}; }
+          50% { box-shadow: 0 0 32px ${theme.glow}; }
         }
       `}</style>
 
-      <h2 style={{ textAlign: "center", marginBottom: 8, fontSize: 28, fontWeight: 700 }}>🎰 Slots</h2>
-      <p style={{ textAlign: "center", color: "#676D7C", marginBottom: 24, fontSize: 13 }}>5 paylines · Provably Fair</p>
+      <h2 style={{ textAlign: "center", marginBottom: 8, fontSize: 28, fontWeight: 700,
+        background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
+        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+      }}>
+        🎰 {title || config?.name || "Slots"}
+      </h2>
+      <p style={{ textAlign: "center", color: "#676D7C", marginBottom: 24, fontSize: 13 }}>
+        5 paylines · Provably Fair
+      </p>
 
       {/* Reels */}
       <div style={{
         display: "flex", gap: 8, justifyContent: "center", marginBottom: 24,
-        padding: 20, borderRadius: 16, background: "rgba(15,17,26,0.8)",
-        border: "1px solid rgba(255,255,255,0.07)",
+        padding: 24, borderRadius: 16,
+        background: theme.bg,
+        border: `1px solid ${theme.primary}33`,
         animation: winLines.length > 0 && !spinning ? "winPulse 1s ease 3" : "none",
       }}>
         {reels.map((reel, i) => (
-          <ReelColumn key={i} symbols={ALL_SYMBOLS} spinning={spinning} result={reel} delay={i * 150} />
+          <ReelColumn key={i} allSymbols={allSymbols} spinning={spinning} result={reel} />
         ))}
       </div>
 
@@ -183,28 +211,31 @@ const SlotsGame = () => {
         onClick={handleSpin} disabled={spinning}
         style={{
           width: "100%", padding: "16px", borderRadius: 10, border: "none",
-          background: spinning ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg, #f59e0b, #ef4444)",
-          color: spinning ? "#676D7C" : "#fff", fontSize: 18, fontWeight: 700,
+          background: spinning ? "rgba(255,255,255,0.05)" : `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
+          color: spinning ? "#676D7C" : "#fff", fontSize: 18, fontWeight: 800,
           cursor: spinning ? "not-allowed" : "pointer", transition: "all 0.2s", marginBottom: 24,
-          letterSpacing: 1,
+          letterSpacing: 1, textShadow: spinning ? "none" : "0 2px 4px rgba(0,0,0,0.3)",
+          boxShadow: spinning ? "none" : `0 4px 16px ${theme.glow}`,
         }}
       >
         {spinning ? "🎰 Spinning..." : "🎰 SPIN"}
       </button>
 
       {/* Paytable */}
-      <div style={{ padding: "16px 20px", borderRadius: 12, background: "rgba(15,17,26,0.55)", marginBottom: 20 }}>
-        <div style={{ color: "#676D7C", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Paytable</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "6px 16px" }}>
-          {PAYTABLE.map(({ symbol, pay3, pay2 }) => (
-            <div key={symbol} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-              <span style={{ fontSize: 20 }}>{symbol}</span>
-              <span style={{ color: "#fff" }}>×3 = <span style={{ color: "#f59e0b", fontWeight: 600 }}>{pay3}</span></span>
-              {pay2 && <span style={{ color: "#676D7C", fontSize: 11 }}>×2 = {pay2}</span>}
-            </div>
-          ))}
+      {paytable.length > 0 && (
+        <div style={{ padding: "16px 20px", borderRadius: 12, background: "rgba(15,17,26,0.55)", marginBottom: 20 }}>
+          <div style={{ color: "#676D7C", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Paytable</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "6px 16px" }}>
+            {paytable.map(({ symbol, pay3, pay2 }) => (
+              <div key={symbol} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                <span style={{ fontSize: 22 }}>{symbol}</span>
+                <span style={{ color: "#fff" }}>×3 = <span style={{ color: theme.primary, fontWeight: 600 }}>{pay3}</span></span>
+                {pay2 && <span style={{ color: "#676D7C", fontSize: 11 }}>×2 = {pay2}</span>}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* History */}
       {history.length > 0 && (
