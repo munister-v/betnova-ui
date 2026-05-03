@@ -5,6 +5,7 @@ import ImagesSection from "../../Common/ImagesSection/ImagesSection";
 import NavigationHeader from "../../Common/NavigationHeader/NavigationHeader";
 import SearchAndFilters from "../../Common/SearchAndFilters/SearchAndFilters";
 import LiveWinsSection from "../../Common/WinnerCard/LiveWinsSection";
+import GameTiles from "../../Common/GameTiles/GameTiles";
 import { StyledPageContainer } from "./styles";
 
 const Casino = () => {
@@ -17,6 +18,8 @@ const Casino = () => {
 
       <NavigationHeader isNftPage={false} />
       <div className="content-container">
+        <GameTiles title="BetNova Originals" />
+
         <SearchAndFilters />
 
         <ImagesSection

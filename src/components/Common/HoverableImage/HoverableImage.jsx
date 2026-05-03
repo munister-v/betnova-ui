@@ -1,13 +1,14 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { StyledHoverableImage } from "./styles";
 
-const HoverableImage = ({ src, alt }) => {
+const HoverableImage = ({ src, alt, to = "/slots" }) => {
   return (
-    <div>
+    <Link to={to} style={{ textDecoration: "none" }}>
       <StyledHoverableImage>
         <img src={src} alt={alt} className="image-card" />
       </StyledHoverableImage>
-    </div>
+    </Link>
   );
 };
 

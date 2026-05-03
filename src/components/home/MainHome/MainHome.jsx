@@ -9,6 +9,7 @@ import CryptoSection from "../../Common/CryptoCard/CryptoSection";
 import NTFSection from "../../Common/NFTCard/NTFSectionWithHeader";
 import StepsSection from "../../Common/StepSection/StepsSection";
 import LiveWinsSection from "../../Common/WinnerCard/LiveWinsSection";
+import GameTiles from "../../Common/GameTiles/GameTiles";
 import NewTableView from "./NewTableView";
 
 const steps = [
@@ -42,6 +43,9 @@ const MainHome = ({ update }) => {
       {/* image area frame main */}
 
       <LiveWinsSection title="Live wins" hasFilters={true} />
+
+      {/* Our games — clickable tiles */}
+      <GameTiles title="Play Now" />
 
       {/* casino view */}
 
