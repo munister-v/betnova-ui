@@ -1,32 +1,17 @@
 import React from "react";
-
-import { DATA_CONTENT } from "../../../assets/MockData/mockData";
-import ImagesSection from "../../Common/ImagesSection/ImagesSection";
-import NavigationHeader from "../../Common/NavigationHeader/NavigationHeader";
-import SearchAndFilters from "../../Common/SearchAndFilters/SearchAndFilters";
 import LiveWinsSection from "../../Common/WinnerCard/LiveWinsSection";
+import NavigationHeader from "../../Common/NavigationHeader/NavigationHeader";
 import { StyledPageContainer } from "./styles";
+import BlackjackGame from "./BlackjackGame";
 
-const Blackjack = () => {
-  const category = "Casino";
-  const subcategory = "BLACKJACK";
-
-  return (
-    <StyledPageContainer>
-      <LiveWinsSection title="Live wins" hasFilters={true} />
-
-      <NavigationHeader isNftPage={false} />
-      <div className="content-container">
-        <SearchAndFilters hasSortByOptions={true} hasProviderOptions={true} />
-
-        <ImagesSection
-          category={category}
-          subcategory={subcategory}
-          images={DATA_CONTENT}
-        />
-      </div>
-    </StyledPageContainer>
-  );
-};
+const Blackjack = () => (
+  <StyledPageContainer>
+    <LiveWinsSection title="Live wins" hasFilters={false} />
+    <NavigationHeader isNftPage={false} />
+    <div className="content-container">
+      <BlackjackGame />
+    </div>
+  </StyledPageContainer>
+);
 
 export default Blackjack;
