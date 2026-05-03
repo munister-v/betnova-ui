@@ -57,6 +57,7 @@ import Profile from "./components/home/Account/Profile/Profile";
 import Referrals from "./components/home/Account/Referrals/Referrals";
 import Settings from "./components/home/Account/Settings/Settings";
 import Withdrawals from "./components/home/Account/Withdrawals/Withdrawals";
+import VIP from "./components/home/Account/VIP/VIP";
 import PageLayout from "./components/home/MainHome/PageLayout";
 import {
   ContentLayout,
@@ -120,6 +121,7 @@ const routesAccountLayout = [
   { path: "/account/deposits/:tab", component: Deposits },
   { path: "/account/withdrawals/:tab", component: Withdrawals },
   { path: "/account/settings", component: Settings },
+  { path: "/account/vip/:tab", component: VIP },
 ];
 
 function App() {
