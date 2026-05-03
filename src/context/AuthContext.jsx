@@ -3,6 +3,7 @@
 import { apiClient, gameApi, authUtils } from '@/lib/api'
 import supabase from '@/lib/supabase'
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { toast } from 'react-toastify'
 
 // User types
 // interface User {
@@ -146,7 +147,19 @@ export function AuthProvider({ children }) {
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error || 'Login failed')
-      await fetchUserProfile()
+      // Immediately set user from login response so UI updates right away
+      setUser(prev => ({
+        ...prev,
+        id: data.user.id,
+        email: data.user.email,
+        username: data.user.username,
+        isAuthenticated: true,
+        isLoading: false,
+        profile: data.user,
+        balance: data.user.balance ?? 0,
+      }))
+      toast.success(`Welcome back, ${data.user.username}! 👋`)
+      fetchUserProfile().catch(() => {})
     } catch (error) {
       console.error('Sign in error:', error)
       throw new Error(error.message || 'Sign in failed')
@@ -167,7 +180,18 @@ export function AuthProvider({ children }) {
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error || 'Registration failed')
-      await fetchUserProfile()
+      setUser(prev => ({
+        ...prev,
+        id: data.user.id,
+        email: data.user.email,
+        username: data.user.username,
+        isAuthenticated: true,
+        isLoading: false,
+        profile: data.user,
+        balance: 0,
+      }))
+      toast.success(`Welcome to BetNova, ${data.user.username}! 🎉`)
+      fetchUserProfile().catch(() => {})
     } catch (error) {
       console.error('Sign up error:', error)
       throw new Error(error.message || 'Sign up failed')
@@ -410,7 +434,7 @@ export function AuthProvider({ children }) {
         balance: 0
       })
       
-      console.log('✅ User signed out successfully')
+      toast.info('Logged out. See you next time! 👋')
       
       // Redirect to home page
       if (typeof window !== 'undefined') {

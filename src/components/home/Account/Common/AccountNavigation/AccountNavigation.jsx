@@ -9,6 +9,7 @@ import { ReactComponent as GEAR } from "../../../../../assets/images/Frame (51).
 import { ReactComponent as OUT } from "../../../../../assets/images/Frame (52).svg";
 import { ReactComponent as MONEY } from "../../../../../assets/images/Frame (53).svg";
 import { StyleAccountNavigation } from "./styles";
+import { useAuth } from "@/context/AuthContext";
 
 const links = [
   {
@@ -56,6 +57,7 @@ const links = [
 const AccountNavigation = () => {
   const [selectedOption, setSelectedOption] = useState(links[0].to);
   const { updateLoggedIn } = useContext(AppContext);
+  const { signOut } = useAuth();
 
   const location = useLocation();
 
@@ -74,7 +76,7 @@ const AccountNavigation = () => {
           key={index}
           onClick={() => {
             setSelectedOption(button.to);
-            if (button.label === "Log Out") updateLoggedIn(false);
+            if (button.label === "Log Out") { signOut(); updateLoggedIn(false); }
           }}
         >
           <div
