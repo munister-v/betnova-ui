@@ -58,6 +58,7 @@ import Referrals from "./components/home/Account/Referrals/Referrals";
 import Settings from "./components/home/Account/Settings/Settings";
 import Withdrawals from "./components/home/Account/Withdrawals/Withdrawals";
 import VIP from "./components/home/Account/VIP/VIP";
+import SlotsGame from "./components/Pages/Casino/SlotsGame";
 import PageLayout from "./components/home/MainHome/PageLayout";
 import {
   ContentLayout,
@@ -99,6 +100,7 @@ const routesContentLayout = [
   { path: "/crash", component: CrashGame },
   { path: "/coinflip", component: CoinflipGame },
   { path: "/mines", component: MineGame },
+  { path: "/slots-game", component: SlotsGame },
   { path: "/slots", component: Slots },
   { path: "/with-challenges", component: WithChallenges },
   { path: "/with-sidebets", component: WithSidebets },
