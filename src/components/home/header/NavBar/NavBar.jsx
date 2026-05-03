@@ -30,6 +30,7 @@ const NavBar = () => {
   } = useContext(AppContext);
 
   const { user } = useAuth();
+  const balance = `$${parseFloat(user?.balance || 0).toFixed(2)}`;
 
   return (
     <StyledNavBar>
@@ -60,7 +61,7 @@ const NavBar = () => {
           {user?.profile && (
             <div className="money-container">
               {isTabletScreen && !isMobileScreen ? (
-                <TotalMoneyContainer money="$0.00" />
+                <TotalMoneyContainer money={balance} />
               ) : null}
               <RewardsButton />
             </div>
@@ -79,7 +80,7 @@ const NavBar = () => {
             >
               {!isTabletScreen && (
                 <>
-                  <TotalMoneyContainer money="$0.00" />
+                  <TotalMoneyContainer money={balance} />
 
                   <CashierModal button={"Cashier"} />
 

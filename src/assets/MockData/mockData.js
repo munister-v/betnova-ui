@@ -91,6 +91,9 @@ export const SECTIONS = [
           },
           { icon: ROULETTE, text: "Roulette", sidebarUrl: "/roulette" },
           { icon: BLACKJACK, text: "Blackjack", sidebarUrl: "/blackjack" },
+          { icon: AK_ORIGINALS, text: "Crash", sidebarUrl: "/crash" },
+          { icon: AK_ORIGINALS, text: "Coinflip", sidebarUrl: "/coinflip" },
+          { icon: AK_ORIGINALS, text: "Mines", sidebarUrl: "/mines" },
           {
             icon: WITH_SIDEBETS,
             text: "With Sidebets",

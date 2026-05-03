@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "@/context/AuthContext";
 
 //assets
 import { ReactComponent as MONEY } from "../../../../assets/images/Frame (53).svg";
@@ -9,6 +10,10 @@ import AccountPageTitle from "../Common/AccountPageTitle";
 import { StyleProfile } from "../Profile/styles";
 
 const BalancesPage = () => {
+  const { user } = useAuth();
+  const balance = typeof user?.balance === "number" ? user.balance : parseFloat(user?.balance || 0);
+  const formatted = balance.toFixed(2);
+
   return (
     <StyleProfile>
       <AccountPageTitle icon={MONEY} title="Balances" />
@@ -26,7 +31,7 @@ const BalancesPage = () => {
             Switch Balance
           </div>
           <div class="total">
-            Total:<span>$0.00</span>
+            Total:<span>${formatted}</span>
           </div>
         </div>
         <div
@@ -84,7 +89,6 @@ const BalancesPage = () => {
                 />
                 <p
                   style={{
-                    width: "39px",
                     color: "#fff",
                     fontSize: "14px",
                     fontStyle: "normal",
@@ -92,7 +96,7 @@ const BalancesPage = () => {
                     lineHeight: "16.8px",
                   }}
                 >
-                  $0.00
+                  ${formatted}
                 </p>
               </div>
             </div>

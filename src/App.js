@@ -22,6 +22,10 @@ import GameShows from "./components/Pages/Casino/GameShows";
 import LiveCasino from "./components/Pages/Casino/LiveCasino";
 import Rollercoaster from "./components/Pages/Casino/Rollercoaster";
 import Roulette from "./components/Pages/Casino/Roulette";
+import CrashGame from "./components/Pages/Casino/CrashGame";
+import CoinflipGame from "./components/Pages/Casino/CoinflipGame";
+import MineGame from "./components/Pages/Casino/MineGame";
+import RouletteGame from "./components/Pages/Casino/RouletteGame";
 import Slots from "./components/Pages/Casino/Slots";
 import WithChallenges from "./components/Pages/Casino/WithChallenges";
 import WithSidebets from "./components/Pages/Casino/WithSidebets";
@@ -90,7 +94,10 @@ const routesContentLayout = [
   { path: "/game-shows", component: GameShows },
   { path: "/live-casino", component: LiveCasino },
   { path: "/rollercoaster", component: Rollercoaster },
-  { path: "/roulette", component: Roulette },
+  { path: "/roulette", component: RouletteGame },
+  { path: "/crash", component: CrashGame },
+  { path: "/coinflip", component: CoinflipGame },
+  { path: "/mines", component: MineGame },
   { path: "/slots", component: Slots },
   { path: "/with-challenges", component: WithChallenges },
   { path: "/with-sidebets", component: WithSidebets },
@@ -128,6 +135,7 @@ function App() {
         <Routes>
           {routesSportsLayout.map((route) => (
             <Route
+              key={route.path}
               path={route.path}
               element={
                 <SportsContentLayout isTabletScreen={isTabletScreen}>
@@ -141,6 +149,7 @@ function App() {
         <Routes>
           {routesContentLayout.map((route) => (
             <Route
+              key={route.path}
               path={route.path}
               element={
                 <ContentLayout isTabletScreen={isTabletScreen}>
@@ -153,13 +162,14 @@ function App() {
 
         <Routes>
           {routesBets.map((route) => (
-            <Route path={route.path} element={<route.component />} />
+            <Route key={route.path} path={route.path} element={<route.component />} />
           ))}
         </Routes>
 
         <Routes>
           {routesAccountLayout.map((route) => (
             <Route
+              key={route.path}
               path={route.path}
               element={
                 <ContentLayout isTabletScreen={isTabletScreen}>

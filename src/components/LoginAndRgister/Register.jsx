@@ -1,25 +1,28 @@
 import { useFormik } from "formik";
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import * as Yup from "yup";
-
-//assets
-import { AppContext } from "../../context/AppContext";
 import { ReactComponent as STEAM } from "../../assets/images/Frame (22).svg";
 import { ReactComponent as TWITCH } from "../../assets/images/Frame (23).svg";
 import { ReactComponent as METAMASK } from "../../assets/images/Frame (24).svg";
 import SocialMediaButton from "../Common/Buttons/SocialMediaButton/SocialMediaButton";
+import { useAuth } from "@/context/AuthContext";
+import { showErrorToast } from "@/utils/toastUtils";
 
-const Login = (props) => {
-  const { updateLoggedIn } = useContext(AppContext);
+const Register = (props) => {
+  const { signUp } = useAuth();
+  const [emailSent, setEmailSent] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const validationSchema = Yup.object().shape({
-    username: Yup.string().required("Username is required"),
+    username: Yup.string()
+      .min(3, "Username must be at least 3 characters")
+      .required("Username is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string()
       .required("Password is required")
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        "Password must contain at least 8 characters, one lowercase letter, one uppercase letter, one number, and one special symbol"
+        "Password must contain at least 8 characters, one uppercase letter, one number, and one special symbol"
       ),
   });
 
@@ -29,12 +32,60 @@ const Login = (props) => {
       email: "",
       password: "",
     },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      // Handle form submission (e.g., login request)
-      updateLoggedIn(true);
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        await signUp(values.email, values.password, { name: values.username });
+        setRegisteredEmail(values.email);
+        setEmailSent(true);
+      } catch (error) {
+        console.error("Registration failed:", error);
+        showErrorToast(error.message || "Registration failed. Please try again.");
+        formik.setSubmitting(false);
+      }
     },
   });
+
+  if (emailSent) {
+    return (
+      <div style={{ textAlign: "center", padding: "24px 0" }}>
+        <div
+          style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: "rgba(255, 232, 26, 0.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              stroke="#FFE81A"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <p style={{ color: "#fff", fontSize: "16px", fontWeight: "bold", marginBottom: "8px" }}>
+          Check your email
+        </p>
+        <p style={{ color: "#B1B6C6", fontSize: "14px", lineHeight: "1.5" }}>
+          We sent a confirmation link to
+        </p>
+        <p style={{ color: "#FFE81A", fontSize: "14px", marginBottom: "20px" }}>
+          {registeredEmail}
+        </p>
+        <p style={{ color: "#B1B6C6", fontSize: "13px" }}>
+          Click the link in the email to activate your account.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -88,33 +139,57 @@ const Login = (props) => {
               value={formik.values.password}
               onChange={formik.handleChange}
               placeholder="********"
+              autoComplete="new-password"
             />
-
-            <span
-              style={{
-                color: "#B1B6C6",
-                fontSize: "13px",
-                cursor: "pointer",
-                marginTop: "8px",
-              }}
-            >
-              Forget Password?
-            </span>
             {formik.errors.password && (
               <div className="error-message">{formik.errors.password}</div>
             )}
           </div>
 
-          <div class="info-text-container">
-            <p class="info-text">
+          <div className="info-text-container">
+            <p className="info-text">
               This site is protected by reCAPTCHA and the Google Privacy Policy
               and Terms of Service apply.
             </p>
           </div>
 
-          <button type="submit" className="register-button uppercase">
-            Register
+          <button
+            type="submit"
+            className="register-button uppercase"
+            disabled={formik.isSubmitting}
+            style={{
+              opacity: formik.isSubmitting ? 0.7 : 1,
+              cursor: formik.isSubmitting ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            {formik.isSubmitting ? (
+              <>
+                <div
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    border: "2px solid rgb(20, 23, 34)",
+                    borderTop: "2px solid rgba(20, 23, 34, 0.2)",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                <span>Creating account...</span>
+              </>
+            ) : (
+              "Register"
+            )}
           </button>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
         </form>
       </div>
 
@@ -138,4 +213,4 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+export default Register;

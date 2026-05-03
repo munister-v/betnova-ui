@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 
 //assets
@@ -19,6 +20,8 @@ import TotalMoneyContainer from "./TotalMoneyContainer";
 //Models
 
 const UpdatedNavbar = () => {
+  const { user } = useAuth();
+  const balance = `$${parseFloat(user?.balance || 0).toFixed(2)}`;
   const [isCoupen, setisCoupen] = useState(false);
   const [isReferral, setisReferral] = useState(false);
 
@@ -581,7 +584,7 @@ const UpdatedNavbar = () => {
               gap: "15px",
             }}
           >
-            <TotalMoneyContainer money="$0.00" />
+            <TotalMoneyContainer money={balance} />
 
             <CashierModal />
 

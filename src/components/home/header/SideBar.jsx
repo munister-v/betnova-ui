@@ -104,9 +104,8 @@ const SideBar = () => {
 
             <div className="other-section">
               {section.options.map((option, optionIndex) => (
-                <>
+                <React.Fragment key={optionIndex}>
                   <SidebarOption
-                    key={optionIndex}
                     onClick={() =>
                       handleSidebarOptionClick(
                         sectionIndex,
@@ -141,7 +140,7 @@ const SideBar = () => {
                       activeSubOptionIndex={selectedOption}
                     />
                   )}
-                </>
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -149,7 +148,7 @@ const SideBar = () => {
         <div className="divider" />
 
         <div className="payment">
-          <Button className="buy-crypto">Buy Crypto</Button>
+          <Button className="buy-crypto" onClick={() => {}}>Buy Crypto</Button>
 
           <div className="payment-methods">
             <VISA_IMG />

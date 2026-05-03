@@ -1,6 +1,8 @@
 import { useFormik } from "formik";
 import React, { useState } from "react";
 import * as Yup from "yup";
+import supabase from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 // Importing SVG icons
 import { ReactComponent as GEAR } from "../../../../assets/images/Frame (51).svg";
@@ -8,14 +10,16 @@ import AccountPageTitle from "../Common/AccountPageTitle";
 import { StyleProfile } from "../Profile/styles";
 
 const Settings = () => {
+  const { user } = useAuth();
   const [toastMessage, setToastMessage] = useState("");
+  const [toastError, setToastError] = useState(false);
 
-  const displayToast = (message) => {
+  const displayToast = (message, isError = false) => {
     setToastMessage(message);
-
-    // Clear the toast after a delay (e.g., 3000ms or 3 seconds)
+    setToastError(isError);
     setTimeout(() => {
       setToastMessage("");
+      setToastError(false);
     }, 3000);
   };
 
@@ -25,7 +29,9 @@ const Settings = () => {
 
   const passwordValidationSchema = Yup.object().shape({
     oldPassword: Yup.string().required("Old Password is required"),
-    newPassword: Yup.string().required("New Password is required"),
+    newPassword: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("New Password is required"),
   });
 
   const emailFormik = useFormik({
@@ -33,9 +39,17 @@ const Settings = () => {
       email: "",
     },
     validationSchema: emailValidationSchema,
-    onSubmit: (values, { resetForm }) => {
-      displayToast("Email changed successfully.");
-      resetForm();
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        const { error } = await supabase.auth.updateUser({ email: values.email });
+        if (error) throw error;
+        displayToast("Confirmation email sent. Please check your inbox.");
+        resetForm();
+      } catch (err) {
+        displayToast(err.message || "Failed to update email.", true);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -45,9 +59,24 @@ const Settings = () => {
       newPassword: "",
     },
     validationSchema: passwordValidationSchema,
-    onSubmit: (values, { resetForm }) => {
-      displayToast("Password changed successfully.");
-      resetForm();
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        // Re-authenticate with old password first
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: user?.email,
+          password: values.oldPassword,
+        });
+        if (signInError) throw new Error("Old password is incorrect.");
+
+        const { error } = await supabase.auth.updateUser({ password: values.newPassword });
+        if (error) throw error;
+        displayToast("Password changed successfully.");
+        resetForm();
+      } catch (err) {
+        displayToast(err.message || "Failed to change password.", true);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -83,7 +112,7 @@ const Settings = () => {
             >
               <path d="M26,2C12.7,2,2,12.7,2,26s10.7,24,24,24s24-10.7,24-24S39.3,2,26,2z M39.4,20L24.1,35.5 c-0.6,0.6-1.6,0.6-2.2,0L13.5,27c-0.6-0.6-0.6-1.6,0-2.2l2.2-2.2c0.6-0.6,1.6-0.6,2.2,0l4.4,4.5c0.4,0.4,1.1,0.4,1.5,0L35,15.5 c0.6-0.6,1.6-0.6,2.2,0l2.2,2.2C40.1,18.3,40.1,19.3,39.4,20z"></path>
             </svg>
-            <div>Unverified</div>
+            <div>{user?.email || "Unverified"}</div>
           </div>
         </div>
         <form onSubmit={emailFormik.handleSubmit}>
@@ -115,7 +144,16 @@ const Settings = () => {
           {emailFormik.errors.email && (
             <div className="required">{emailFormik.errors.email}</div>
           )}
-          <button class="submit-button" style={{ marginTop: "24px" }}>
+          <button
+            className="submit-button"
+            type="button"
+            style={{ marginTop: "24px" }}
+            onClick={async () => {
+              const { error } = await supabase.auth.resend({ type: "signup", email: user?.email });
+              if (error) displayToast(error.message, true);
+              else displayToast("Verification email sent!");
+            }}
+          >
             Send verification email
           </button>
         </form>
@@ -276,7 +314,11 @@ const Settings = () => {
           </button>
         </div>
       </div>
-      {toastMessage && <div className="toast">{toastMessage}</div>}
+      {toastMessage && (
+        <div className="toast" style={toastError ? { background: "#c0392b" } : {}}>
+          {toastMessage}
+        </div>
+      )}
     </StyleProfile>
   );
 };
