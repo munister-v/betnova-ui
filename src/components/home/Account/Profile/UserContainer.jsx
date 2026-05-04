@@ -59,8 +59,8 @@ const UserContainer = () => {
       .catch(() => {});
   }, [user?.isAuthenticated]);
 
-  const level = xpData?.level ?? user?.profile?.level ?? 1;
-  const xp = xpData?.xp ?? user?.profile?.xp ?? 0;
+  const level = xpData?.level ?? user?.level ?? 1;
+  const xp = xpData?.xp ?? user?.xp ?? 0;
   const { pct, nextXp, nextLevel } = getProgress(xp, level);
 
   return (

@@ -54,7 +54,7 @@ const NavBar = () => {
             <BetNovaLogo size={isMobileScreen ? "sm" : "md"} />
           </Link>
           {/* Rewards Button */}
-          {user?.profile && (
+          {user?.isAuthenticated && (
             <div className="money-container">
               {isTabletScreen && !isMobileScreen ? (
                 <TotalMoneyContainer money={balance} />
@@ -64,7 +64,7 @@ const NavBar = () => {
           )}
         </div>
 
-        {user?.profile && (
+        {user?.isAuthenticated && (
           <>
             {/* Coins / Cashier / Buy Crypto Section */}
             <div
@@ -88,7 +88,7 @@ const NavBar = () => {
         )}
 
         <div style={{ display: "flex", alignItems: "center" }}>
-          {!user?.profile && (
+          {!user?.isAuthenticated && (
             <>
               <RegisterModal modalOption="login" />
               <RegisterModal modalOption="register" />
@@ -98,7 +98,7 @@ const NavBar = () => {
           {!isTabletScreen && (
             <div style={{ display: "flex" }}>
               {/* Account Section */}
-              {user?.profile && <AccountButton />}
+              {user?.isAuthenticated && <AccountButton />}
 
               <SearchModal />
               {isChatBoxOpen === false ? (

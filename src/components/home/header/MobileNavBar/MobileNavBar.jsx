@@ -35,7 +35,7 @@ const MobileNavBar = () => {
             <path d="m464.883 353.467h-417.766c-25.98 0-47.117 21.137-47.117 47.149 0 25.98 21.137 47.117 47.117 47.117h417.766c25.98 0 47.117-21.137 47.117-47.117 0-26.012-21.137-47.149-47.117-47.149z"></path>
           </svg>
         </button>
-        {user?.profile && (
+        {user?.isAuthenticated && (
           <>
             <AccountButton />
             <CashierModal button={"Cashier"} />

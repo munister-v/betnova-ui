@@ -60,7 +60,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(
-    user?.profile?.avatar || DefaultAvatar
+    user?.avatar_url || DefaultAvatar
   );
   const inputRef = useRef(null);
 
@@ -81,17 +81,17 @@ const Profile = () => {
 
   // Initialize form data from user profile
   useEffect(() => {
-    if (user?.profile) {
+    if (user?.isAuthenticated) {
       formik.setValues({
-        displayName: user.profile.displayName || user.profile.username || user.profile.name || "",
-        email: user.profile.email || "",
-        bio: user.profile.bio || "",
+        displayName: user.username || "",
+        email: user.email || "",
+        bio: user.bio || "",
       });
-      if (user.profile.avatar) {
-        setPreview(user.profile.avatar);
+      if (user.avatar_url) {
+        setPreview(user.avatar_url);
       }
     }
-  }, [user?.profile]);
+  }, [user?.isAuthenticated]);
 
   // Cleanup preview URL
   useEffect(() => {
@@ -181,13 +181,9 @@ const Profile = () => {
   const handleSaveChanges = async (values) => {
     // Check if data has actually changed
     const hasChanges =
-      values.displayName.trim() !==
-      (user?.profile?.displayName ||
-        user?.profile?.username ||
-        user?.profile?.name ||
-        "") ||
-      values.email.trim() !== (user?.profile?.email || "") ||
-      values.bio.trim() !== (user?.profile?.bio || "");
+      values.displayName.trim() !== (user?.username || "") ||
+      values.email.trim() !== (user?.email || "") ||
+      values.bio.trim() !== (user?.bio || "");
 
     if (!hasChanges) {
       showToast("No changes were made to save.", "warning");
@@ -249,22 +245,19 @@ const Profile = () => {
 
   const handleCancel = () => {
     setIsEditing(false);
-    // Reset form data to original values
-    if (user?.profile) {
+    if (user?.isAuthenticated) {
       formik.setValues({
-        displayName:
-          user.profile.displayName || user.profile.username || user.profile.name || "",
-        email: user.profile.email || "",
-        bio: user.profile.bio || "",
+        displayName: user.username || "",
+        email: user.email || "",
+        bio: user.bio || "",
       });
     }
-    // Reset file and preview
     if (file) {
       setFile(null);
       if (preview && preview.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
       }
-      setPreview(user?.profile?.avatar || "/assets/images/avatar/default.png");
+      setPreview(user?.avatar_url || DefaultAvatar);
     }
   };
 
