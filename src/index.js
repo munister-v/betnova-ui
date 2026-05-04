@@ -5,6 +5,7 @@ import { AppProvider } from "./context/AppContext";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,8 +13,10 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AppProvider>
     <AuthProvider>
-      <App />
-      <ToastContainer transition={Bounce} />
+      <SocketProvider>
+        <App />
+        <ToastContainer transition={Bounce} />
+      </SocketProvider>
     </AuthProvider>
   </AppProvider>
 );
