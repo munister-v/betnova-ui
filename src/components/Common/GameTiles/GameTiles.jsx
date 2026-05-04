@@ -65,6 +65,17 @@ const GAMES = [
     badgeColor: "#ef4444",
   },
   {
+    name: "Plinko",
+    path: "/plinko",
+    provider: "BetNova Originals",
+    bg: "linear-gradient(160deg, #0a001a 0%, #3b0764 40%, #7c3aed 100%)",
+    accent: "#a78bfa",
+    deco: "🔮",
+    decoStyle: { fontSize: 90, bottom: 20, right: -5, opacity: 0.25 },
+    badge: "NEW",
+    badgeColor: "#7c3aed",
+  },
+  {
     name: "Jackpot",
     path: "/jackpot",
     provider: "BetNova Originals",

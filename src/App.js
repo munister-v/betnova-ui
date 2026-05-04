@@ -25,6 +25,7 @@ import Roulette from "./components/Pages/Casino/Roulette";
 import CrashGame from "./components/Pages/Casino/CrashGame";
 import CoinflipGame from "./components/Pages/Casino/CoinflipGame";
 import MineGame from "./components/Pages/Casino/MineGame";
+import PlinkoGame from "./components/Pages/Casino/PlinkoGame";
 import RouletteGame from "./components/Pages/Casino/RouletteGame";
 import Slots from "./components/Pages/Casino/Slots";
 import WithChallenges from "./components/Pages/Casino/WithChallenges";
@@ -102,6 +103,7 @@ const routesContentLayout = [
   { path: "/crash", component: CrashGame },
   { path: "/coinflip", component: CoinflipGame },
   { path: "/mines", component: MineGame },
+  { path: "/plinko", component: PlinkoGame },
   { path: "/slots-game", component: SlotsGame },
   { path: "/slots", component: Slots },
   { path: "/with-challenges", component: WithChallenges },
