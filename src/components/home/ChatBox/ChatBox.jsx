@@ -2,7 +2,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { AppContext } from "../../../context/AppContext";
 import { useAuth } from "@/context/AuthContext";
-import { SocketIOClient, connectWebSocket, emitSocketEvent, onSocketEvent, offSocketEvent } from "@/lib/websocket";
+import { useSocket } from "@/context/SocketContext";
 
 import { ReactComponent as MSG } from "../../../assets/images/Frame (31).svg";
 import { ReactComponent as CANDLE_ICON } from "../../../assets/images/Frame (32).svg";
@@ -28,6 +28,7 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
   const { pathname } = useLocation();
   const { isTabletScreen, isChatBoxCollapsed, updateChatBoxCollapsed } = useContext(AppContext);
   const { user } = useAuth();
+  const { socket } = useSocket() || {};
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -35,11 +36,11 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
   const [activeButton, setActiveButton] = useState("chat");
   const messagesEndRef = useRef(null);
 
-  // Load history on mount
+  // Load history
   useEffect(() => {
     fetch(`${BACKEND}/api/chat/history?limit=50`)
-      .then((r) => r.json())
-      .then((json) => {
+      .then(r => r.json())
+      .then(json => {
         if (json.success && Array.isArray(json.messages)) {
           setMessages(json.messages.reverse());
         }
@@ -47,48 +48,35 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
       .catch(() => {});
   }, []);
 
-  // Socket.IO listeners
+  // Socket listeners
   useEffect(() => {
-    connectWebSocket().catch(() => {});
+    if (!socket) return;
 
     const handleMessage = (msg) => {
-      setMessages((prev) => {
-        // Avoid duplicates
-        if (prev.find((m) => m.id === msg.id)) return prev;
-        const next = [...prev, msg];
-        return next.slice(-100); // keep last 100
+      setMessages(prev => {
+        if (prev.find(m => m.id === msg.id)) return prev;
+        return [...prev, msg].slice(-100);
       });
     };
-
     const handleOnline = ({ count }) => setOnlineCount(count);
-    const handleError = ({ error }) => console.warn("Chat error:", error);
 
-    onSocketEvent("chat:message", handleMessage);
-    onSocketEvent("chat:online", handleOnline);
-    onSocketEvent("chat:error", handleError);
+    socket.on("chat:message", handleMessage);
+    socket.on("chat:online", handleOnline);
 
     return () => {
-      offSocketEvent("chat:message", handleMessage);
-      offSocketEvent("chat:online", handleOnline);
-      offSocketEvent("chat:error", handleError);
+      socket.off("chat:message", handleMessage);
+      socket.off("chat:online", handleOnline);
     };
-  }, []);
+  }, [socket]);
 
   // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleButtonClick = (button) => setActiveButton(button);
-  const handleCollapse = () => updateChatBoxCollapsed(!isChatBoxCollapsed);
-
   const handleSend = () => {
-    if (!message.trim()) return;
-    if (!user?.isAuthenticated) {
-      alert("Please log in to chat.");
-      return;
-    }
-    emitSocketEvent("chat:send", { content: message.trim() });
+    if (!message.trim() || !user?.isAuthenticated || !socket) return;
+    socket.emit("chat:send", { content: message.trim() });
     setMessage("");
   };
 
@@ -113,20 +101,19 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
             <div className="chat-trades">
               <div
                 className={`btn-chatbox ${activeButton === "chat" ? "active-btn" : ""}`}
-                onClick={() => handleButtonClick("chat")}
+                onClick={() => setActiveButton("chat")}
               >
                 <MSG />
                 Chat
                 {onlineCount > 0 && (
                   <span style={{ fontSize: "11px", color: "#4ade80", marginLeft: "4px" }}>
-                    {onlineCount} online
+                    · {onlineCount} online
                   </span>
                 )}
               </div>
               <div
                 className={`btn-chatbox ${activeButton === "trades" ? "active-btn" : ""}`}
-                style={{ cursor: "pointer" }}
-                onClick={() => handleButtonClick("trades")}
+                onClick={() => setActiveButton("trades")}
               >
                 <CANDLE_ICON className="switch-icon" />
                 Trades
@@ -138,7 +125,7 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
               <div className="container-buttons">
                 <COLLAPSE
                   className={`collapse-icon ${isChatBoxCollapsed ? "collapsed" : ""}`}
-                  onClick={handleCollapse}
+                  onClick={() => updateChatBoxCollapsed(!isChatBoxCollapsed)}
                 />
                 <CROSS className="cross-icon" onClick={() => setIsChatBox(false)} />
               </div>
@@ -152,10 +139,10 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
                   <p>No Messages Yet</p>
                 </ImagePart>
               ) : (
-                <div className="chat-messages" style={{ overflowY: "auto", maxHeight: "400px" }}>
-                  {messages.map((msg, index) => (
+                <div className="chat-messages" style={{ overflowY: "auto", maxHeight: "calc(100vh - 220px)", flex: 1 }}>
+                  {messages.map((msg, i) => (
                     <CardMessage
-                      key={msg.id || index}
+                      key={msg.id || i}
                       rankIcon={renderAvatar(msg)}
                       playerName={renderUsername(msg)}
                       messageText={msg.content}
@@ -167,9 +154,9 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
 
               <MessageInput
                 type="text"
-                placeholder={user?.isAuthenticated ? "Type a message..." : "Log in to chat"}
+                placeholder={user?.isAuthenticated ? "Type a message…" : "Log in to chat"}
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={e => setMessage(e.target.value)}
                 onKeyPress={handleInputKeyPress}
                 disabled={!user?.isAuthenticated}
               />
@@ -194,17 +181,13 @@ const ChatBox = ({ isChatBox, setIsChatBox }) => {
             </>
           ) : (
             <div className="container-bets">
-              <div className="section-title" style={{ marginBottom: "21px" }}>
-                My Active Bets
-              </div>
+              <div className="section-title" style={{ marginBottom: "21px" }}>My Active Bets</div>
               <div className="active-bets" style={{ padding: "0px 0px 10px" }}>
                 <CANDLE_ICON />
                 <div className="text">No Bets Yet</div>
               </div>
               <div style={{ paddingTop: "25px" }}>
-                <div className="section-title" style={{ marginBottom: "10px" }}>
-                  Market Prices
-                </div>
+                <div className="section-title" style={{ marginBottom: "10px" }}>Market Prices</div>
                 <CryptoFuturesCoins />
               </div>
             </div>

@@ -28,6 +28,7 @@ import MineGame from "./components/Pages/Casino/MineGame";
 import PlinkoGame from "./components/Pages/Casino/PlinkoGame";
 import DiceGame from "./components/Pages/Casino/DiceGame";
 import HiloGame from "./components/Pages/Casino/HiloGame";
+import KenoGame from "./components/Pages/Casino/KenoGame";
 import RouletteGame from "./components/Pages/Casino/RouletteGame";
 import Slots from "./components/Pages/Casino/Slots";
 import WithChallenges from "./components/Pages/Casino/WithChallenges";
@@ -108,6 +109,7 @@ const routesContentLayout = [
   { path: "/plinko", component: PlinkoGame },
   { path: "/dice", component: DiceGame },
   { path: "/hilo", component: HiloGame },
+  { path: "/keno", component: KenoGame },
   { path: "/slots-game", component: SlotsGame },
   { path: "/slots", component: Slots },
   { path: "/with-challenges", component: WithChallenges },

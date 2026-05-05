@@ -98,6 +98,17 @@ const GAMES = [
     badgeColor: "#7c3aed",
   },
   {
+    name: "Keno",
+    path: "/keno",
+    provider: "BetNova Originals",
+    bg: "linear-gradient(160deg, #0a1a00 0%, #14532d 40%, #16a34a 100%)",
+    accent: "#4ade80",
+    deco: "🎯",
+    decoStyle: { fontSize: 90, bottom: 20, right: -5, opacity: 0.25 },
+    badge: "NEW",
+    badgeColor: "#16a34a",
+  },
+  {
     name: "Jackpot",
     path: "/jackpot",
     provider: "BetNova Originals",

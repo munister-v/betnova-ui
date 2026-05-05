@@ -24,6 +24,9 @@ const Referrals = () => {
   const [newCode, setNewCode] = useState("");
   const [creating, setCreating] = useState(false);
   const [formMsg, setFormMsg] = useState(null);
+  const [pending, setPending] = useState(0);
+  const [claiming, setClaiming] = useState(false);
+  const [claimMsg, setClaimMsg] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,6 +43,12 @@ const Referrals = () => {
       const res2 = await fetch(`${BACKEND}/api/referrals/users`, { credentials: "include" });
       const json2 = await res2.json();
       if (json2.success) setReferredUsers(json2.users || []);
+    } catch (_) {}
+
+    try {
+      const res3 = await fetch(`${BACKEND}/api/referrals/pending`, { credentials: "include" });
+      const json3 = await res3.json();
+      if (json3.success) setPending(json3.pending || 0);
     } catch (_) {}
 
     setLoading(false);
@@ -71,6 +80,30 @@ const Referrals = () => {
       setFormMsg({ error: true, text: "Network error." });
     }
     setCreating(false);
+  };
+
+  const handleClaim = async () => {
+    if (pending <= 0 || claiming) return;
+    setClaiming(true);
+    setClaimMsg(null);
+    try {
+      const res = await fetch(`${BACKEND}/api/referrals/claim`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      const json = await res.json();
+      if (json.success) {
+        setClaimMsg({ error: false, text: `Claimed $${json.claimed.toFixed(2)}!` });
+        setPending(0);
+        setStats((s) => ({ ...s, total_earned: s.total_earned }));
+      } else {
+        setClaimMsg({ error: true, text: json.error || "Claim failed." });
+      }
+    } catch (_) {
+      setClaimMsg({ error: true, text: "Network error." });
+    }
+    setClaiming(false);
   };
 
   const renderTabContent = () => {
@@ -152,6 +185,26 @@ const Referrals = () => {
         <div style={{ flex: 1, padding: "16px 20px", borderRadius: "8px", background: "rgba(15,17,26,0.55)", color: "#fff" }}>
           <div style={{ color: "#aaa", fontSize: "12px", marginBottom: "4px" }}>Total Earned</div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: "#4ade80" }}>${parseFloat(stats.total_earned).toFixed(2)}</div>
+        </div>
+        <div style={{ flex: 1, padding: "16px 20px", borderRadius: "8px", background: "rgba(15,17,26,0.55)", color: "#fff" }}>
+          <div style={{ color: "#aaa", fontSize: "12px", marginBottom: "4px" }}>Pending Claim</div>
+          <div style={{ fontSize: "22px", fontWeight: 700, color: "#FFB018" }}>${pending.toFixed(2)}</div>
+          <button
+            onClick={handleClaim}
+            disabled={pending <= 0 || claiming}
+            style={{
+              marginTop: "8px", padding: "6px 14px", borderRadius: "6px", border: "none",
+              background: pending > 0 ? "#FFB018" : "#444", color: pending > 0 ? "#000" : "#888",
+              fontWeight: 700, fontSize: "13px", cursor: pending > 0 ? "pointer" : "not-allowed",
+            }}
+          >
+            {claiming ? "Claiming…" : "Claim"}
+          </button>
+          {claimMsg && (
+            <div style={{ marginTop: "6px", fontSize: "12px", color: claimMsg.error ? "#f87171" : "#4ade80" }}>
+              {claimMsg.text}
+            </div>
+          )}
         </div>
       </div>
 
